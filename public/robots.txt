@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mongolens.dev/sitemap.xml
+Sitemap: https://mongolens.pages.dev/sitemap.xml

@@ -7,15 +7,20 @@
 *Diagnose unindexed COLLSCANs, slow queries, operation latency spikes, and pipeline bottlenecks locally in your browser with zero server uploads.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)](LICENSE)
+[![Deployed on Cloudflare Pages](https://img.shields.io/badge/Deployed_on-Cloudflare_Pages-F38020.svg?style=for-the-badge&logo=cloudflare&logoColor=white)](https://mongolens.pages.dev/)
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-38B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Privacy: 100% Client-Side](https://img.shields.io/badge/Privacy-100%25_Local_Air--Gapped-10B981.svg?style=for-the-badge&logo=shield&logoColor=white)](#-100-privacy--security-guarantee)
 
 <br />
 
-[**🌐 Try Live Demo**](https://mongolens.app) • [**✨ Key Features**](#-key-features) • [**🚀 Quick Start**](#-getting-started) • [**🧠 Architecture**](#-architecture--performance) • [**⌨️ Shortcuts**](#-keyboard-shortcuts)
+### 🚀 **[Use MongoLens Online — mongolens.pages.dev](https://mongolens.pages.dev/)**
+*No installation or sign-up needed. Drop your `mongod.log` or `mongod.log.gz` file and analyze in seconds.*
+
+<br />
+
+[**🌐 Live App**](https://mongolens.pages.dev/) • [**✨ Key Features**](#-key-features) • [**🚀 Quick Start**](#-getting-started) • [**🧠 Architecture**](#-architecture--performance) • [**⌨️ Shortcuts**](#-keyboard-shortcuts)
 
 <br />
 
@@ -215,7 +220,7 @@ We take database privacy seriously:
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/mongolens/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/selvamanikrish/MongoLens/issues).
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)

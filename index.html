@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>MongoLens — Free In-Browser MongoDB Log Analyzer & Slow Query Profiler</title>
+    <meta name="title" content="MongoLens — Free In-Browser MongoDB Log Analyzer & Slow Query Profiler" />
+    <meta name="description" content="Inspect, analyze and troubleshoot MongoDB logs locally in your browser. Auto-decompress .gz files, detect slow queries, unindexed COLLSCANs, and get instant ESR index recommendations with 100% privacy." />
+    <meta name="keywords" content="mongodb log analyzer, mongod log gz analyzer, mongodb slow query analyzer, collscan detector, mongodb profiler, mongodb index advisor, mongod.log.gz parser, database performance diagnostic, local mongodb analyzer, esr index generator, mongolens, mongodb diagnostic tool" />
+    <meta name="author" content="MongoLens" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://mongolens.dev/" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mongolens.dev/" />
+    <meta property="og:title" content="MongoLens — Free In-Browser MongoDB Log Analyzer & Slow Query Profiler" />
+    <meta property="og:description" content="Analyze MongoDB logs locally in your browser with zero server uploads. Decompress .gz logs, isolate slow queries, detect COLLSCANs, and get ESR index advice." />
+    <meta property="og:image" content="/favicon.svg" />
+    <meta property="og:site_name" content="MongoLens" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://mongolens.dev/" />
+    <meta name="twitter:title" content="MongoLens — MongoDB Log Analyzer & Profiler" />
+    <meta name="twitter:description" content="Analyze MongoDB logs locally in your browser. 100% privacy-first, ultra-fast GZIP streaming, COLLSCAN detection, and ESR index suggestions." />
+    <meta name="twitter:image" content="/favicon.svg" />
+
+    <!-- Favicon & Themes -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#090d14" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- JSON-LD Structured Data Schema for Search Engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "MongoLens",
+        "url": "https://mongolens.dev",
+        "description": "High-performance browser-based MongoDB log analyzer for diagnosing slow queries, unindexed COLLSCAN scans, operation latencies, and database errors locally.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All (Web Browser)",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "In-Browser Streaming GZIP Decompression",
+          "Slow Query Analysis & Latency Percentiles",
+          "Unindexed COLLSCAN Detection",
+          "Equality-Sort-Range (ESR) Index Recommendations",
+          "60 FPS Virtualized Raw Log Console",
+          "100% Client-Side Privacy Guarantee"
+        ]
+      }
+    </script>
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MONGOLENS1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-MONGOLENS1', { anonymize_ip: true });
+    </script>
+
+    <!-- Preconnect & Google Fonts (Inter + JetBrains Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-background text-slate-100 font-sans antialiased selection:bg-brand-500/30 selection:text-brand-300 min-h-screen overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

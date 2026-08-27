@@ -1,0 +1,17 @@
+{
+  "short_name": "MongoLens",
+  "name": "MongoLens — MongoDB Log Analyzer & Slow Query Profiler",
+  "description": "Analyze and troubleshoot MongoDB logs locally in your browser with zero server uploads.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#090d14",
+  "theme_color": "#00ed64",
+  "display": "standalone",
+  "orientation": "any"
+}

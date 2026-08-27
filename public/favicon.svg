@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#090d14"/>
+  <!-- Database Cylinder Top -->
+  <ellipse cx="14" cy="9" rx="8" ry="3.5" fill="#00684a" stroke="#00ed64" stroke-width="1.2"/>
+  <!-- Database Cylinder Middle -->
+  <path d="M6 9v7c0 1.933 3.582 3.5 8 3.5s8-1.567 8-3.5V9" fill="none" stroke="#00ed64" stroke-width="1.2"/>
+  <!-- Database Cylinder Bottom -->
+  <path d="M6 16v7c0 1.933 3.582 3.5 8 3.5s8-1.567 8-3.5V16" fill="none" stroke="#00c753" stroke-width="1.2" opacity="0.7"/>
+  <!-- Glowing Lens -->
+  <circle cx="21" cy="20" r="6" fill="#090d14" fill-opacity="0.8" stroke="#38bdf8" stroke-width="1.8"/>
+  <circle cx="21" cy="20" r="4.5" fill="#38bdf8" fill-opacity="0.2"/>
+  <!-- Lens Handle -->
+  <line x1="25.5" y1="24.5" x2="29" y2="28" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+</svg>

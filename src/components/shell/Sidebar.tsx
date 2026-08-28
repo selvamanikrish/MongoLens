@@ -15,6 +15,7 @@ import {
   Sparkles,
   Mail,
   FileText,
+  X,
 } from 'lucide-react';
 
 interface NavItem {
@@ -29,6 +30,8 @@ interface NavItem {
 export const Sidebar: React.FC = () => {
   const activePage = useLogStore((state) => state.activePage);
   const setActivePage = useLogStore((state) => state.setActivePage);
+  const isMobileSidebarOpen = useLogStore((state) => state.isMobileSidebarOpen);
+  const setMobileSidebarOpen = useLogStore((state) => state.setMobileSidebarOpen);
   const logResult = useLogStore((state) => state.logResult);
   const fileInfo = useLogStore((state) => state.fileInfo);
   const clearData = useLogStore((state) => state.clearData);
@@ -65,12 +68,21 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-[#090d14] border-r border-white/5 flex flex-col justify-between h-screen sticky top-0 select-none z-20">
+    <aside
+      className={`
+        fixed lg:sticky top-0 left-0 z-50 lg:z-20
+        w-72 sm:w-64 max-w-[85vw] lg:max-w-none h-screen
+        bg-[#090d14] border-r border-white/10 lg:border-white/5
+        flex flex-col justify-between select-none
+        transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
+        ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}
+    >
       {/* Brand Header */}
-      <div>
+      <div className="overflow-y-auto">
         <div className="p-4 flex items-center justify-between border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-700 to-brand-400 p-[1px] shadow-glow-brand flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-700 to-brand-400 p-[1px] shadow-glow-brand flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-[#090d14] rounded-[7px] flex items-center justify-center">
                 <Database className="w-4 h-4 text-brand-400" />
               </div>
@@ -85,6 +97,15 @@ export const Sidebar: React.FC = () => {
               <p className="text-[10px] text-slate-400">Log Analyzer</p>
             </div>
           </div>
+
+          {/* Mobile Close Button */}
+          <button
+            onClick={() => setMobileSidebarOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            title="Close navigation"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Navigation List */}

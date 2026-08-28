@@ -27,6 +27,8 @@ export const AppShell: React.FC = () => {
   const isParsing = useLogStore((state) => state.isParsing);
   const activePage = useLogStore((state) => state.activePage);
   const setActivePage = useLogStore((state) => state.setActivePage);
+  const isMobileSidebarOpen = useLogStore((state) => state.isMobileSidebarOpen);
+  const setMobileSidebarOpen = useLogStore((state) => state.setMobileSidebarOpen);
   const setCommandPaletteOpen = useLogStore((state) => state.setCommandPaletteOpen);
   const setShortcutsOpen = useLogStore((state) => state.setShortcutsOpen);
   const setDrawerOpen = useLogStore((state) => state.setDrawerOpen);
@@ -34,6 +36,17 @@ export const AppShell: React.FC = () => {
   const setPrivacyOpen = useLogStore((state) => state.setPrivacyOpen);
   const setContactOpen = useLogStore((state) => state.setContactOpen);
   const clearData = useLogStore((state) => state.clearData);
+
+  // Auto-close mobile sidebar on desktop resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [setMobileSidebarOpen]);
 
   // Global Keyboard Shortcuts Listener
   useEffect(() => {
@@ -64,9 +77,10 @@ export const AppShell: React.FC = () => {
         return;
       }
 
-      // 3. Escape -> Close drawer / modals
+      // 3. Escape -> Close drawer / modals / mobile sidebar
       if (e.key === 'Escape') {
         setDrawerOpen(false);
+        setMobileSidebarOpen(false);
         setCommandPaletteOpen(false);
         setShortcutsOpen(false);
         setTermsOpen(false);
@@ -111,7 +125,7 @@ export const AppShell: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
       clearTimeout(gKeyTimeout);
     };
-  }, [setActivePage, setCommandPaletteOpen, setShortcutsOpen, setDrawerOpen, setTermsOpen, setPrivacyOpen, setContactOpen, clearData]);
+  }, [setActivePage, setCommandPaletteOpen, setShortcutsOpen, setDrawerOpen, setMobileSidebarOpen, setTermsOpen, setPrivacyOpen, setContactOpen, clearData]);
 
   // If no log is parsed or actively in initial upload state, render landing / dropzone
   if (!logResult || isParsing) {
@@ -148,7 +162,16 @@ export const AppShell: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#090d14] text-slate-100 font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#090d14] text-slate-100 font-sans overflow-hidden relative">
+      {/* Mobile Backdrop Overlay */}
+      {isMobileSidebarOpen && (
+        <div
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 lg:hidden animate-fade-in"
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar Navigation */}
       <Sidebar />
 

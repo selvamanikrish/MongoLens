@@ -21,12 +21,12 @@ export const TimelinePage: React.FC = () => {
   const { timeline, summary, slowQueries } = logResult;
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Clock className="w-5 h-5 text-brand-400" />
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-brand-400 shrink-0" />
             <span>Event Timeline & Traffic Spikes</span>
           </h1>
           <p className="text-xs text-slate-400">
@@ -34,8 +34,8 @@ export const TimelinePage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10">
-          <span>
+        <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10 self-start sm:self-auto">
+          <span className="truncate">
             {summary.timeRange?.start
               ? `${new Date(summary.timeRange.start).toLocaleTimeString()} → ${new Date(
                   summary.timeRange.end
@@ -46,29 +46,29 @@ export const TimelinePage: React.FC = () => {
       </div>
 
       {/* Main Composed Chart */}
-      <div className="p-5 rounded-2xl glass-panel border border-white/10 space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="p-3.5 sm:p-5 rounded-2xl glass-panel border border-white/10 space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Activity className="w-4 h-4 text-brand-400" />
+            <Activity className="w-4 h-4 text-brand-400 shrink-0" />
             <span>Query Traffic, Latency & Failure Correlation</span>
           </h3>
-          <div className="flex items-center gap-4 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono">
             <div className="flex items-center gap-1.5 text-brand-400">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0" />
               <span>Throughput</span>
             </div>
             <div className="flex items-center gap-1.5 text-orange-400">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
-              <span>Slow Queries</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0" />
+              <span>Slow</span>
             </div>
             <div className="flex items-center gap-1.5 text-red-400">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0" />
               <span>Errors</span>
             </div>
           </div>
         </div>
 
-        <div className="h-[320px] w-full pt-2">
+        <div className="h-[240px] sm:h-[320px] w-full pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={timeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />

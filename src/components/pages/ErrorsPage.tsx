@@ -17,12 +17,12 @@ export const ErrorsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-400" />
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
             <span>Errors & Exceptions Hub</span>
             <span className="text-xs font-mono font-normal text-red-400 bg-red-950/40 px-2 py-0.5 rounded-md border border-red-500/30">
               {summary.errorsCount} total events
@@ -35,24 +35,24 @@ export const ErrorsPage: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl glass-card border border-white/10">
-          <span className="text-xs text-slate-400 block mb-1">Total Error Occurrences</span>
-          <span className="text-2xl font-bold font-mono text-red-400">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
+        <div className="p-3.5 sm:p-4 rounded-xl glass-card border border-white/10">
+          <span className="text-[11px] sm:text-xs text-slate-400 block mb-1">Total Error Occurrences</span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-red-400">
             {summary.errorsCount.toLocaleString()}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl glass-card border border-white/10">
-          <span className="text-xs text-slate-400 block mb-1">Unique Error Signatures</span>
-          <span className="text-2xl font-bold font-mono text-slate-200">
+        <div className="p-3.5 sm:p-4 rounded-xl glass-card border border-white/10">
+          <span className="text-[11px] sm:text-xs text-slate-400 block mb-1">Unique Error Signatures</span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-slate-200">
             {errorGroups.length} distinct types
           </span>
         </div>
 
-        <div className="p-4 rounded-xl glass-card border border-white/10">
-          <span className="text-xs text-slate-400 block mb-1">System Warnings</span>
-          <span className="text-2xl font-bold font-mono text-amber-400">
+        <div className="p-3.5 sm:p-4 rounded-xl glass-card border border-white/10">
+          <span className="text-[11px] sm:text-xs text-slate-400 block mb-1">System Warnings</span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-amber-400">
             {summary.warningsCount.toLocaleString()}
           </span>
         </div>

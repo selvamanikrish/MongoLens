@@ -153,21 +153,21 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-3 max-h-[65vh] overflow-y-auto">
+        <div className="p-3.5 sm:p-4 space-y-3 max-h-[75vh] overflow-y-auto">
           {/* Diagnostic Markdown Report */}
-          <div className="p-3.5 rounded-xl bg-brand-950/30 border border-brand-500/30 hover:border-brand-500/60 transition-all flex items-center justify-between">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-brand-950/30 border border-brand-500/30 hover:border-brand-500/60 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-300 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-300 flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-xs font-semibold text-slate-100">Diagnostic Executive Report</h4>
-                <p className="text-[11px] text-slate-400">Comprehensive Markdown report with KPIs, slow queries & ESR suggestions</p>
+                <p className="text-[11px] text-slate-400">Comprehensive Markdown report with KPIs & slow queries</p>
               </div>
             </div>
             <button
               onClick={exportDiagnosticMarkdown}
-              className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+              className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm self-end sm:self-auto"
             >
               <Download className="w-3.5 h-3.5" />
               Markdown
@@ -175,9 +175,9 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
           </div>
 
           {/* Slow Queries CSV */}
-          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/15 text-orange-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-orange-500/15 text-orange-400 flex items-center justify-center shrink-0">
                 <FileSpreadsheet className="w-4 h-4" />
               </div>
               <div>
@@ -187,7 +187,7 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
             </div>
             <button
               onClick={exportSlowQueriesCSV}
-              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5 border border-white/10"
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5 border border-white/10 self-end sm:self-auto"
             >
               <Download className="w-3.5 h-3.5 text-orange-400" />
               CSV
@@ -195,9 +195,9 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
           </div>
 
           {/* Full Filtered Logs JSON / JSONL */}
-          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0">
                 <FileCode className="w-4 h-4" />
               </div>
               <div>
@@ -205,7 +205,7 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
                 <p className="text-[11px] text-slate-400">{filteredEntries.length.toLocaleString()} matching log entries</p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 self-end sm:self-auto">
               <button
                 onClick={exportFilteredJSON}
                 className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors border border-white/10"
@@ -222,9 +222,9 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
           </div>
 
           {/* CSV & Raw TXT */}
-          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4" />
               </div>
               <div>
@@ -232,7 +232,7 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
                 <p className="text-[11px] text-slate-400">Export table fields or unparsed original log lines</p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 self-end sm:self-auto">
               <button
                 onClick={exportFilteredCSV}
                 className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors border border-white/10"

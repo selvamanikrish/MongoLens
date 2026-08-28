@@ -47,12 +47,12 @@ export const CollectionsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Database className="w-5 h-5 text-cyan-400" />
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Database className="w-5 h-5 text-cyan-400 shrink-0" />
             <span>Collections & Namespaces Analytics</span>
             <span className="text-xs font-mono font-normal text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded-md border border-cyan-500/30">
               {collections.length} namespaces
@@ -64,7 +64,7 @@ export const CollectionsPage: React.FC = () => {
         </div>
 
         {/* Collection Search Box */}
-        <div className="relative max-w-xs w-full">
+        <div className="relative max-w-full sm:max-w-xs w-full">
           <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -79,13 +79,13 @@ export const CollectionsPage: React.FC = () => {
       {/* Collections Table */}
       <div className="rounded-2xl glass-panel border border-white/10 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[640px]">
             <thead>
               <tr className="bg-[#090d16] border-b border-white/10 text-slate-400 font-mono text-[11px]">
-                <th className="py-3 px-4 font-semibold">Namespace</th>
+                <th className="py-3 px-3 sm:px-4 font-semibold">Namespace</th>
                 <th
                   onClick={() => handleSort('queries')}
-                  className="py-3 px-4 font-semibold cursor-pointer hover:text-white transition-colors"
+                  className="py-3 px-3 sm:px-4 font-semibold cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>Queries</span>
@@ -94,7 +94,7 @@ export const CollectionsPage: React.FC = () => {
                 </th>
                 <th
                   onClick={() => handleSort('avg')}
-                  className="py-3 px-4 font-semibold cursor-pointer hover:text-white transition-colors"
+                  className="py-3 px-3 sm:px-4 font-semibold cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>Avg Latency</span>
@@ -103,7 +103,7 @@ export const CollectionsPage: React.FC = () => {
                 </th>
                 <th
                   onClick={() => handleSort('p95')}
-                  className="py-3 px-4 font-semibold cursor-pointer hover:text-white transition-colors"
+                  className="py-3 px-3 sm:px-4 font-semibold cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>P95 Latency</span>
@@ -112,7 +112,7 @@ export const CollectionsPage: React.FC = () => {
                 </th>
                 <th
                   onClick={() => handleSort('slow')}
-                  className="py-3 px-4 font-semibold cursor-pointer hover:text-white transition-colors"
+                  className="py-3 px-3 sm:px-4 font-semibold cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>Slow Queries</span>
@@ -121,7 +121,7 @@ export const CollectionsPage: React.FC = () => {
                 </th>
                 <th
                   onClick={() => handleSort('collscan')}
-                  className="py-3 px-4 font-semibold cursor-pointer hover:text-white transition-colors"
+                  className="py-3 px-3 sm:px-4 font-semibold cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>COLLSCANs</span>
@@ -130,14 +130,14 @@ export const CollectionsPage: React.FC = () => {
                 </th>
                 <th
                   onClick={() => handleSort('errors')}
-                  className="py-3 px-4 font-semibold cursor-pointer hover:text-white transition-colors"
+                  className="py-3 px-3 sm:px-4 font-semibold cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1">
                     <span>Errors</span>
                     <ArrowUpDown className="w-3 h-3 text-slate-500" />
                   </div>
                 </th>
-                <th className="py-3 px-4 text-right font-semibold">Action</th>
+                <th className="py-3 px-3 sm:px-4 text-right font-semibold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 font-mono">

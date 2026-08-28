@@ -45,6 +45,7 @@ interface LogStoreState {
   filters: FilterState;
   selectedQuery: LogEntry | null;
   isDrawerOpen: boolean;
+  isMobileSidebarOpen: boolean;
   isCommandPaletteOpen: boolean;
   isShortcutsOpen: boolean;
   isExportOpen: boolean;
@@ -56,6 +57,7 @@ interface LogStoreState {
   parseFile: (file: File) => void;
   loadDemoLog: () => void;
   setActivePage: (page: ActivePage) => void;
+  setMobileSidebarOpen: (open: boolean) => void;
   setFilters: (filters: Partial<FilterState>) => void;
   resetFilters: () => void;
   selectQuery: (query: LogEntry | null) => void;
@@ -88,6 +90,7 @@ export const useLogStore = create<LogStoreState>((set) => ({
   filters: initialFilters,
   selectedQuery: null,
   isDrawerOpen: false,
+  isMobileSidebarOpen: false,
   isCommandPaletteOpen: false,
   isShortcutsOpen: false,
   isExportOpen: false,
@@ -108,6 +111,7 @@ export const useLogStore = create<LogStoreState>((set) => ({
     set({
       fileInfo: { name: file.name, size: file.size, type: file.type || 'text/plain' },
       isParsing: true,
+      isMobileSidebarOpen: false,
       parseProgress: {
         phase: file.name.endsWith('.gz') || file.name.endsWith('.zip') ? 'decompressing' : 'parsing',
         progress: 0,
@@ -213,9 +217,11 @@ export const useLogStore = create<LogStoreState>((set) => ({
   },
 
   setActivePage: (page: ActivePage) => {
-    set({ activePage: page });
+    set({ activePage: page, isMobileSidebarOpen: false });
     trackPageView(page);
   },
+
+  setMobileSidebarOpen: (open: boolean) => set({ isMobileSidebarOpen: open }),
 
   setFilters: (newFilters: Partial<FilterState>) =>
     set((state) => ({
@@ -228,6 +234,7 @@ export const useLogStore = create<LogStoreState>((set) => ({
     set({
       selectedQuery: query,
       isDrawerOpen: query !== null,
+      isMobileSidebarOpen: false,
     });
     if (query) {
       trackSlowQueryInspected(query.planSummary || 'UNKNOWN', query.durationMillis || 0);
@@ -235,12 +242,12 @@ export const useLogStore = create<LogStoreState>((set) => ({
   },
 
   setDrawerOpen: (open: boolean) => set({ isDrawerOpen: open }),
-  setCommandPaletteOpen: (open: boolean) => set({ isCommandPaletteOpen: open }),
-  setShortcutsOpen: (open: boolean) => set({ isShortcutsOpen: open }),
-  setExportOpen: (open: boolean) => set({ isExportOpen: open }),
-  setTermsOpen: (open: boolean) => set({ isTermsOpen: open }),
-  setPrivacyOpen: (open: boolean) => set({ isPrivacyOpen: open }),
-  setContactOpen: (open: boolean) => set({ isContactOpen: open }),
+  setCommandPaletteOpen: (open: boolean) => set({ isCommandPaletteOpen: open, isMobileSidebarOpen: false }),
+  setShortcutsOpen: (open: boolean) => set({ isShortcutsOpen: open, isMobileSidebarOpen: false }),
+  setExportOpen: (open: boolean) => set({ isExportOpen: open, isMobileSidebarOpen: false }),
+  setTermsOpen: (open: boolean) => set({ isTermsOpen: open, isMobileSidebarOpen: false }),
+  setPrivacyOpen: (open: boolean) => set({ isPrivacyOpen: open, isMobileSidebarOpen: false }),
+  setContactOpen: (open: boolean) => set({ isContactOpen: open, isMobileSidebarOpen: false }),
 
   clearData: () => {
     if (activeWorker) {
@@ -253,6 +260,7 @@ export const useLogStore = create<LogStoreState>((set) => ({
       logResult: null,
       selectedQuery: null,
       isDrawerOpen: false,
+      isMobileSidebarOpen: false,
       filters: initialFilters,
     });
   },

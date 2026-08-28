@@ -294,14 +294,17 @@ export const CommandPalette: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div
+      onClick={() => setIsOpen(false)}
+      className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-3 sm:px-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+    >
       <div
-        className="w-full max-w-2xl bg-[#0d1424] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+        className="w-full max-w-2xl bg-[#0d1424] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Box */}
-        <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-[#0a0f1d]">
-          <Search className="w-5 h-5 text-brand-400 shrink-0" />
+        <div className="p-3.5 sm:p-4 border-b border-white/10 flex items-center gap-2.5 sm:gap-3 bg-[#0a0f1d]">
+          <Search className="w-4 sm:w-5 h-4 sm:h-5 text-brand-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -312,17 +315,17 @@ export const CommandPalette: React.FC = () => {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Type a command, search query, or namespace..."
-            className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none font-mono"
+            className="w-full bg-transparent text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none font-mono"
           />
-          <kbd className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
+          <kbd className="text-[9px] sm:text-[10px] font-mono px-1.5 sm:px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400 shrink-0">
             ESC
           </kbd>
         </div>
 
         {/* Results List */}
-        <div className="overflow-y-auto p-2 divide-y divide-white/5 max-h-[420px]">
+        <div className="overflow-y-auto p-1.5 sm:p-2 divide-y divide-white/5 max-h-[420px]">
           {filteredItems.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500">
+            <div className="p-6 sm:p-8 text-center text-xs text-slate-500">
               No matching commands or actions found for "{query}".
               <br />
               <button
@@ -345,29 +348,29 @@ export const CommandPalette: React.FC = () => {
                   key={item.id}
                   onClick={item.action}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-xs transition-colors ${
+                  className={`flex items-center justify-between px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer text-xs transition-colors gap-2 ${
                     isSelected
                       ? 'bg-brand-500/15 text-brand-200 border border-brand-500/30'
                       : 'text-slate-300 hover:bg-white/5 border border-transparent'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <div
-                      className={`w-7 h-7 rounded-md flex items-center justify-center ${
+                      className={`w-6 sm:w-7 h-6 sm:h-7 rounded-md flex items-center justify-center shrink-0 ${
                         isSelected ? 'bg-brand-500/20 text-brand-400' : 'bg-white/5 text-slate-400'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
                     </div>
-                    <div>
-                      <div className="font-medium text-slate-100">{item.label}</div>
+                    <div className="min-w-0">
+                      <div className="font-medium text-slate-100 truncate text-xs sm:text-sm">{item.label}</div>
                       {item.sublabel && (
-                        <div className="text-[11px] font-mono text-slate-500">{item.sublabel}</div>
+                        <div className="text-[10px] sm:text-[11px] font-mono text-slate-500 truncate">{item.sublabel}</div>
                       )}
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-500 uppercase tracking-wider shrink-0 hidden sm:inline">
                     {item.category}
                   </span>
                 </div>
@@ -377,8 +380,8 @@ export const CommandPalette: React.FC = () => {
         </div>
 
         {/* Footer shortcuts helper */}
-        <div className="px-4 py-2 bg-[#090d16] border-t border-white/5 flex items-center justify-between text-[11px] text-slate-500">
-          <div className="flex items-center gap-3">
+        <div className="px-3 sm:px-4 py-2 bg-[#090d16] border-t border-white/5 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span>
               <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono">↑↓</kbd> Navigate
             </span>
@@ -386,7 +389,7 @@ export const CommandPalette: React.FC = () => {
               <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono">↵</kbd> Select
             </span>
           </div>
-          <span>MongoLens Command Palette</span>
+          <span className="hidden sm:inline">MongoLens Command Palette</span>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { useLogStore } from '../../store/useLogStore';
 import { useFilteredLogs } from '../../hooks/useFilteredLogs';
 import {
+  Menu,
   Search,
   Download,
   HelpCircle,
@@ -13,6 +14,8 @@ export const TopBar: React.FC = () => {
   const filters = useLogStore((state) => state.filters);
   const setFilters = useLogStore((state) => state.setFilters);
   const resetFilters = useLogStore((state) => state.resetFilters);
+  const isMobileSidebarOpen = useLogStore((state) => state.isMobileSidebarOpen);
+  const setMobileSidebarOpen = useLogStore((state) => state.setMobileSidebarOpen);
   const setCommandPaletteOpen = useLogStore((state) => state.setCommandPaletteOpen);
   const setShortcutsOpen = useLogStore((state) => state.setShortcutsOpen);
   const setExportOpen = useLogStore((state) => state.setExportOpen);
@@ -29,17 +32,27 @@ export const TopBar: React.FC = () => {
     filters.onlyErrors;
 
   return (
-    <header className="h-14 bg-[#090d14]/90 backdrop-blur-md border-b border-white/5 px-6 flex items-center justify-between sticky top-0 z-20 gap-4">
-      {/* Left: Active File & Match count */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-semibold text-slate-200 truncate max-w-[180px] sm:max-w-[240px]">
+    <header className="h-14 bg-[#090d14]/90 backdrop-blur-md border-b border-white/5 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-20 gap-2 sm:gap-4">
+      {/* Left: Mobile Menu Trigger + Active File & Match count */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Mobile Hamburger Menu Toggle */}
+        <button
+          onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
+          className="lg:hidden p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors"
+          title="Open menu"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="w-4 h-4 text-brand-400" />
+        </button>
+
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="font-mono text-xs font-semibold text-slate-200 truncate max-w-[100px] xs:max-w-[140px] sm:max-w-[200px] md:max-w-[260px]">
             {fileInfo?.name || 'mongod.log'}
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
         </div>
 
-        <div className="hidden md:flex items-center gap-1.5 text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+        <div className="hidden xl:flex items-center gap-1.5 text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
           <span className="text-slate-200 font-semibold">{count.toLocaleString()}</span>
           <span>/</span>
           <span>{totalOriginal.toLocaleString()} logs</span>
@@ -47,23 +60,24 @@ export const TopBar: React.FC = () => {
       </div>
 
       {/* Center: Search Bar Trigger (Cmd+K) */}
-      <div className="flex-1 max-w-xl">
+      <div className="flex-1 max-w-xl min-w-0">
         <div
           onClick={() => setCommandPaletteOpen(true)}
-          className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-900/90 border border-white/10 hover:border-brand-500/40 text-slate-400 hover:text-slate-200 text-xs cursor-pointer transition-all shadow-inner group"
+          className="w-full flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-900/90 border border-white/10 hover:border-brand-500/40 text-slate-400 hover:text-slate-200 text-xs cursor-pointer transition-all shadow-inner group"
         >
-          <div className="flex items-center gap-2 flex-1 truncate">
+          <div className="flex items-center gap-2 flex-1 truncate min-w-0">
             <Search className="w-3.5 h-3.5 text-slate-500 group-hover:text-brand-400 transition-colors shrink-0" />
-            <span className="truncate">
+            <span className="truncate text-[11px] sm:text-xs">
               {filters.searchQuery ? (
                 <span className="text-brand-300 font-mono">{filters.searchQuery}</span>
               ) : (
-                'Search logs, namespaces, operations, commands...'
+                <span className="hidden sm:inline">Search logs, namespaces, commands...</span>
               )}
+              {!filters.searchQuery && <span className="sm:hidden">Search...</span>}
             </span>
           </div>
 
-          <kbd className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-slate-400 shrink-0">
+          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-slate-400 shrink-0">
             <span>Ctrl</span>
             <span>K</span>
           </kbd>

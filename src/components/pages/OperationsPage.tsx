@@ -31,12 +31,12 @@ export const OperationsPage: React.FC = () => {
   }));
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Layers className="w-5 h-5 text-purple-400" />
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Layers className="w-5 h-5 text-purple-400 shrink-0" />
             <span>Operations Breakdown</span>
           </h1>
           <p className="text-xs text-slate-400">
@@ -44,22 +44,22 @@ export const OperationsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10">
+        <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10 self-start sm:self-auto">
           <span>Total: <strong className="text-white">{summary.totalOperations.toLocaleString()}</strong> ops</span>
         </div>
       </div>
 
       {/* Latency Comparison Bar Chart */}
-      <div className="p-5 rounded-2xl glass-panel border border-white/10 space-y-4">
+      <div className="p-3.5 sm:p-5 rounded-2xl glass-panel border border-white/10 space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-brand-400" />
-            <span>Average vs P95 Latency by Command (ms)</span>
+            <BarChart2 className="w-4 h-4 text-brand-400 shrink-0" />
+            <span className="truncate">Avg vs P95 Latency by Command (ms)</span>
           </h3>
-          <span className="text-xs text-slate-400 font-mono">Operations: {operations.length}</span>
+          <span className="text-xs text-slate-400 font-mono shrink-0">{operations.length} ops</span>
         </div>
 
-        <div className="h-[260px] w-full pt-2">
+        <div className="h-[220px] sm:h-[260px] w-full pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />

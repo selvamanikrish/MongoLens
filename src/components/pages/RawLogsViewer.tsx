@@ -50,12 +50,12 @@ export const RawLogsViewer: React.FC = () => {
   const severities = ['ALL', 'I', 'W', 'E', 'D'];
 
   return (
-    <div className="p-6 space-y-4 max-w-7xl mx-auto h-[calc(100vh-3.5rem)] flex flex-col animate-fade-in">
+    <div className="p-3.5 sm:p-6 space-y-3 sm:space-y-4 max-w-7xl mx-auto h-[calc(100vh-3.5rem)] flex flex-col animate-fade-in">
       {/* Top Console Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Terminal className="w-5 h-5 text-brand-400" />
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Terminal className="w-5 h-5 text-brand-400 shrink-0" />
             <span>Raw Logs Virtual Console</span>
             <span className="text-xs font-mono font-normal text-slate-400 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
               {filteredEntries.length.toLocaleString()} lines
@@ -67,7 +67,7 @@ export const RawLogsViewer: React.FC = () => {
         </div>
 
         {/* Console Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Jump to Line */}
           <form onSubmit={handleJump} className="flex items-center gap-1">
             <div className="relative">
@@ -76,8 +76,8 @@ export const RawLogsViewer: React.FC = () => {
                 type="number"
                 value={jumpLine}
                 onChange={(e) => setJumpLine(e.target.value)}
-                placeholder="Jump to line..."
-                className="w-32 bg-slate-900 border border-white/10 rounded-lg pl-7 pr-2 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-brand-500"
+                placeholder="Line..."
+                className="w-24 sm:w-32 bg-slate-900 border border-white/10 rounded-lg pl-7 pr-2 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-brand-500"
               />
             </div>
             <button
@@ -125,7 +125,7 @@ export const RawLogsViewer: React.FC = () => {
         className="flex-1 w-full bg-[#070b13] border border-white/10 rounded-2xl overflow-auto font-mono text-xs shadow-2xl relative select-text"
       >
         {filteredEntries.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 space-y-2">
+          <div className="p-8 sm:p-12 text-center text-slate-500 space-y-2">
             <p>No log records match current console filters.</p>
             <button
               onClick={resetFilters}
@@ -139,6 +139,7 @@ export const RawLogsViewer: React.FC = () => {
             style={{
               height: `${rowVirtualizer.getTotalSize()}px`,
               width: '100%',
+              minWidth: '600px',
               position: 'relative',
             }}
           >

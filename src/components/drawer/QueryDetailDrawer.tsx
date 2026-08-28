@@ -50,16 +50,19 @@ export const QueryDetailDrawer: React.FC = () => {
     : selectedQuery.commandStr || selectedQuery.raw;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end animate-fade-in">
+    <div
+      onClick={() => setDrawerOpen(false)}
+      className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end animate-fade-in"
+    >
       <div
-        className="w-full max-w-2xl bg-[#0b101c] border-l border-white/10 h-full flex flex-col shadow-2xl animate-slide-in-right overflow-y-auto"
+        className="w-full sm:max-w-xl md:max-w-2xl bg-[#0b101c] border-l border-white/10 h-full flex flex-col shadow-2xl animate-slide-in-right overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 border-b border-white/10 bg-[#090d16] flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-3">
+        <div className="p-3.5 sm:p-5 border-b border-white/10 bg-[#090d16] flex items-center justify-between sticky top-0 z-10 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div
-              className={`px-3 py-1 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 border ${
+              className={`px-2 sm:px-3 py-1 rounded-full text-xs font-mono font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${
                 durationMs >= 2000
                   ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-glow-error'
                   : durationMs >= 500
@@ -67,32 +70,32 @@ export const QueryDetailDrawer: React.FC = () => {
                   : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
               }`}
             >
-              <Clock className="w-3.5 h-3.5" />
+              <Clock className="w-3.5 h-3.5 shrink-0" />
               <span>{durationText}</span>
             </div>
 
-            <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <span className="uppercase text-brand-400 font-mono">{selectedQuery.operation || 'QUERY'}</span>
+            <div className="min-w-0">
+              <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 truncate">
+                <span className="uppercase text-brand-400 font-mono shrink-0">{selectedQuery.operation || 'QUERY'}</span>
                 <span className="text-slate-500 font-normal">on</span>
-                <span className="font-mono text-slate-200">{selectedQuery.namespace || 'database'}</span>
+                <span className="font-mono text-slate-200 truncate">{selectedQuery.namespace || 'database'}</span>
               </h3>
-              <p className="text-[11px] text-slate-400 font-mono">Line #{selectedQuery.lineNumber} • {selectedQuery.timestamp}</p>
+              <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono truncate">Line #{selectedQuery.lineNumber} • {selectedQuery.timestamp}</p>
             </div>
           </div>
 
           <button
             onClick={() => setDrawerOpen(false)}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-6 flex-1">
+        <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 flex-1">
           {/* Metadata Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
             <div className="p-3 rounded-xl bg-slate-900/90 border border-white/5">
               <span className="text-[11px] text-slate-500 block mb-0.5">Execution Plan</span>
               <span className={`inline-block px-2 py-0.5 rounded text-xs font-mono border ${getPlanBadgeClass(selectedQuery.planSummary)}`}>

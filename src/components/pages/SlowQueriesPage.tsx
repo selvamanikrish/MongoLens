@@ -45,12 +45,12 @@ export const SlowQueriesPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-400" />
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Flame className="w-5 h-5 text-orange-400 shrink-0" />
             <span>Slow Query Analysis</span>
             <span className="text-xs font-mono font-normal text-orange-400 bg-orange-950/40 px-2 py-0.5 rounded-md border border-orange-500/30">
               {sortedQueries.length} found
@@ -61,7 +61,7 @@ export const SlowQueriesPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
             onClick={resetFilters}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-xs transition-colors"
@@ -73,14 +73,14 @@ export const SlowQueriesPage: React.FC = () => {
       </div>
 
       {/* Filter Toolbar Controls */}
-      <div className="p-4 rounded-2xl glass-panel border border-white/10 space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="p-3.5 sm:p-4 rounded-2xl glass-panel border border-white/10 space-y-3 sm:space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Min Duration Presets */}
           <div>
             <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block mb-1.5">
               Minimum Latency ({filters.minDurationMs}ms)
             </label>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               {durationPresets.map((ms) => (
                 <button
                   key={ms}
@@ -152,7 +152,7 @@ export const SlowQueriesPage: React.FC = () => {
               </select>
               <button
                 onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                className="p-1.5 rounded-lg bg-slate-900 border border-white/10 text-slate-400 hover:text-white"
+                className="p-1.5 rounded-lg bg-slate-900 border border-white/10 text-slate-400 hover:text-white shrink-0"
                 title={`Sort ${sortOrder === 'desc' ? 'Ascending' : 'Descending'}`}
               >
                 <ArrowUpDown className="w-4 h-4" />
@@ -162,7 +162,7 @@ export const SlowQueriesPage: React.FC = () => {
         </div>
 
         {/* Plan Summary Badge Filter Pills */}
-        <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-2 text-xs">
+        <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
           <span className="text-slate-500 font-mono text-[11px]">Execution Plan:</span>
           {plans.map((plan) => (
             <button
@@ -185,7 +185,7 @@ export const SlowQueriesPage: React.FC = () => {
       {/* Slow Queries Table */}
       <div className="rounded-2xl glass-panel border border-white/10 overflow-hidden shadow-xl">
         {sortedQueries.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 space-y-3">
+          <div className="p-8 sm:p-12 text-center text-slate-400 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-white/5 text-slate-500 flex items-center justify-center mx-auto">
               <Gauge className="w-6 h-6" />
             </div>
@@ -202,17 +202,17 @@ export const SlowQueriesPage: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[640px]">
               <thead>
                 <tr className="bg-[#090d16] border-b border-white/10 text-slate-400 font-mono text-[11px]">
-                  <th className="py-3 px-4 font-semibold">Latency</th>
-                  <th className="py-3 px-4 font-semibold">Operation</th>
-                  <th className="py-3 px-4 font-semibold">Namespace</th>
-                  <th className="py-3 px-4 font-semibold">Plan Summary</th>
-                  <th className="py-3 px-4 font-semibold">Docs Examined</th>
-                  <th className="py-3 px-4 font-semibold">Docs Returned</th>
-                  <th className="py-3 px-4 font-semibold">Time</th>
-                  <th className="py-3 px-4 text-right font-semibold">Action</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Latency</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Operation</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Namespace</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Plan Summary</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Docs Examined</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Docs Returned</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Time</th>
+                  <th className="py-3 px-3 sm:px-4 text-right font-semibold">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-mono">

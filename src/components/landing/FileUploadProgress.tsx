@@ -39,28 +39,28 @@ export const FileUploadProgress: React.FC = () => {
   }
 
   return (
-    <div className="max-w-xl w-full mx-auto p-6 rounded-2xl glass-panel border border-white/10 shadow-2xl animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
+    <div className="max-w-xl w-full mx-auto p-4 sm:p-6 rounded-2xl glass-panel border border-white/10 shadow-2xl animate-fade-in">
+      <div className="flex items-center justify-between mb-4 gap-2">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 shrink-0">
             {phase === 'decompressing' ? (
-              <FileArchive className="w-5 h-5 animate-pulse" />
+              <FileArchive className="w-4 sm:w-5 h-4 sm:h-5 animate-pulse" />
             ) : phase === 'complete' ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5 text-emerald-400" />
             ) : (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 sm:w-5 h-4 sm:h-5 animate-spin" />
             )}
           </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-100">{fileInfo?.name || 'Processing Log File'}</h4>
-            <p className="text-xs text-slate-400">
+          <div className="min-w-0">
+            <h4 className="text-xs sm:text-sm font-semibold text-slate-100 truncate">{fileInfo?.name || 'Processing Log File'}</h4>
+            <p className="text-[11px] sm:text-xs text-slate-400">
               {fileInfo?.size ? `${(fileInfo.size / (1024 * 1024)).toFixed(2)} MB` : 'Streaming file'}
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <span className="text-sm font-mono font-bold text-brand-400">{progress}%</span>
-          <p className="text-xs text-slate-400 capitalize">{phase}...</p>
+        <div className="text-right shrink-0">
+          <span className="text-xs sm:text-sm font-mono font-bold text-brand-400">{progress}%</span>
+          <p className="text-[10px] sm:text-xs text-slate-400 capitalize">{phase}...</p>
         </div>
       </div>
 
@@ -94,23 +94,23 @@ export const FileUploadProgress: React.FC = () => {
       </div>
 
       {/* Real-time stats footer */}
-      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5 text-center text-xs">
-        <div>
-          <span className="text-slate-500 block">Entries Parsed</span>
-          <span className="font-mono font-semibold text-slate-200">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-3 border-t border-white/5 text-center text-xs">
+        <div className="p-1 sm:p-0">
+          <span className="text-slate-500 block text-[10px] sm:text-xs">Entries</span>
+          <span className="font-mono font-semibold text-slate-200 text-xs sm:text-sm">
             {processedEntries.toLocaleString()}
           </span>
         </div>
-        <div>
-          <span className="text-slate-500 block">Processing Speed</span>
-          <span className="font-mono font-semibold text-brand-400 flex items-center justify-center gap-1">
-            <Zap className="w-3 h-3" />
+        <div className="p-1 sm:p-0">
+          <span className="text-slate-500 block text-[10px] sm:text-xs">Speed</span>
+          <span className="font-mono font-semibold text-brand-400 text-xs sm:text-sm flex items-center justify-center gap-0.5 sm:gap-1">
+            <Zap className="w-3 h-3 shrink-0" />
             {processingSpeedMBps > 0 ? `${processingSpeedMBps} MB/s` : 'Analyzing'}
           </span>
         </div>
-        <div>
-          <span className="text-slate-500 block">Est. Remaining</span>
-          <span className="font-mono font-semibold text-slate-300">
+        <div className="p-1 sm:p-0">
+          <span className="text-slate-500 block text-[10px] sm:text-xs">Est. Left</span>
+          <span className="font-mono font-semibold text-slate-300 text-xs sm:text-sm">
             {estimatedRemainingSeconds > 0 ? `${estimatedRemainingSeconds}s` : '< 1s'}
           </span>
         </div>

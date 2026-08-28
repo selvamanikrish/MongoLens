@@ -28,7 +28,10 @@ export const ContactModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div
+      onClick={() => setIsOpen(false)}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fade-in"
+    >
       <div
         className="w-full max-w-lg bg-[#0d1424] border border-white/15 rounded-2xl shadow-2xl overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}

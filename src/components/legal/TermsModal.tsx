@@ -10,7 +10,10 @@ export const TermsModal: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div
+      onClick={() => setIsOpen(false)}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fade-in"
+    >
       <div
         className="w-full max-w-2xl bg-[#0d1424] border border-white/15 rounded-2xl shadow-2xl overflow-hidden animate-slide-up flex flex-col max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}

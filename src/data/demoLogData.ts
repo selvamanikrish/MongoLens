@@ -50,18 +50,18 @@ export function generateRealisticDemoLog(): string {
 
   // Realistic sample queries pool
   const collections = [
-    { db: 'arcusairdb', coll: 'patientorders', weight: 40 },
-    { db: 'arcusairdb', coll: 'prescriptions', weight: 25 },
-    { db: 'arcusairdb', coll: 'users', weight: 15 },
-    { db: 'arcusairdb', coll: 'appointments', weight: 10 },
-    { db: 'arcusairdb', coll: 'audit_logs', weight: 7 },
-    { db: 'arcusairdb', coll: 'inventory', weight: 3 },
+    { db: 'cloudmart_prod', coll: 'orders', weight: 40 },
+    { db: 'cloudmart_prod', coll: 'products', weight: 25 },
+    { db: 'cloudmart_prod', coll: 'users', weight: 15 },
+    { db: 'cloudmart_prod', coll: 'cart_sessions', weight: 10 },
+    { db: 'cloudmart_prod', coll: 'audit_logs', weight: 7 },
+    { db: 'cloudmart_prod', coll: 'inventory', weight: 3 },
   ];
 
   const slowQueryTemplates = [
     {
-      db: 'arcusairdb',
-      coll: 'patientorders',
+      db: 'cloudmart_prod',
+      coll: 'orders',
       op: 'aggregate',
       duration: 8420,
       plan: 'COLLSCAN',
@@ -69,19 +69,19 @@ export function generateRealisticDemoLog(): string {
       keysExamined: 0,
       nreturned: 450,
       cmd: {
-        aggregate: 'patientorders',
+        aggregate: 'orders',
         pipeline: [
-          { $match: { statusflag: 'A', hospital_id: 102, is_active: true } },
+          { $match: { order_status: 'PROCESSING', store_id: 102, is_active: true } },
           { $sort: { order_date: -1 } },
           { $limit: 100 }
         ],
         cursor: {}
       },
-      appName: 'ArcusAir-BatchSync'
+      appName: 'CloudMart-BatchSync'
     },
     {
-      db: 'arcusairdb',
-      coll: 'prescriptions',
+      db: 'cloudmart_prod',
+      coll: 'products',
       op: 'find',
       duration: 4210,
       plan: 'COLLSCAN',
@@ -89,15 +89,15 @@ export function generateRealisticDemoLog(): string {
       keysExamined: 0,
       nreturned: 12,
       cmd: {
-        find: 'prescriptions',
-        filter: { patient_uuid: 'p-9941-bc', dosage_status: 'PENDING_REVIEW' },
+        find: 'products',
+        filter: { category_id: 'cat-electronics-99', stock_status: 'IN_STOCK' },
         sort: { created_at: -1 }
       },
-      appName: 'ArcusAir-WebAPI'
+      appName: 'CloudMart-WebAPI'
     },
     {
-      db: 'arcusairdb',
-      coll: 'patientorders',
+      db: 'cloudmart_prod',
+      coll: 'orders',
       op: 'aggregate',
       duration: 6150,
       plan: 'COLLSCAN',
@@ -105,19 +105,19 @@ export function generateRealisticDemoLog(): string {
       keysExamined: 0,
       nreturned: 1200,
       cmd: {
-        aggregate: 'patientorders',
+        aggregate: 'orders',
         pipeline: [
-          { $match: { admission_date: { $gte: '2026-08-01' } } },
-          { $lookup: { from: 'users', localField: 'doctor_id', foreignField: '_id', as: 'doctor' } },
-          { $unwind: '$doctor' },
-          { $group: { _id: '$doctor.department', totalOrders: { $sum: 1 } } }
+          { $match: { order_date: { $gte: '2026-08-01' } } },
+          { $lookup: { from: 'users', localField: 'customer_id', foreignField: '_id', as: 'customer' } },
+          { $unwind: '$customer' },
+          { $group: { _id: '$customer.tier', totalOrders: { $sum: 1 } } }
         ],
         cursor: {}
       },
-      appName: 'ArcusAir-ReportingService'
+      appName: 'CloudMart-ReportingService'
     },
     {
-      db: 'arcusairdb',
+      db: 'cloudmart_prod',
       coll: 'users',
       op: 'find',
       duration: 1840,
@@ -127,13 +127,13 @@ export function generateRealisticDemoLog(): string {
       nreturned: 4,
       cmd: {
         find: 'users',
-        filter: { role: 'PHARMACIST', department_code: 'RX-EAST' },
+        filter: { role: 'STORE_MANAGER', region_code: 'US-EAST' },
         sort: { last_login: -1 }
       },
-      appName: 'ArcusAir-Auth'
+      appName: 'CloudMart-Auth'
     },
     {
-      db: 'arcusairdb',
+      db: 'cloudmart_prod',
       coll: 'audit_logs',
       op: 'find',
       duration: 3290,
@@ -143,13 +143,13 @@ export function generateRealisticDemoLog(): string {
       nreturned: 50,
       cmd: {
         find: 'audit_logs',
-        filter: { action: 'MEDICATION_DISPENSED', 'metadata.nurse_id': 884 },
+        filter: { action: 'PAYMENT_PROCESSED', 'metadata.terminal_id': 884 },
         sort: { timestamp: -1 }
       },
-      appName: 'ArcusAir-AuditEngine'
+      appName: 'CloudMart-AuditEngine'
     },
     {
-      db: 'arcusairdb',
+      db: 'cloudmart_prod',
       coll: 'inventory',
       op: 'update',
       duration: 2140,
@@ -160,26 +160,26 @@ export function generateRealisticDemoLog(): string {
       cmd: {
         update: 'inventory',
         updates: [
-          { q: { drug_code: 'NDC-4819-21', batch_expiry: { $lt: '2026-09-01' } }, u: { $set: { is_quarantine: true } }, multi: true }
+          { q: { sku: 'SKU-8821-WH', warehouse_expiry: { $lt: '2026-09-01' } }, u: { $set: { is_quarantine: true } }, multi: true }
         ]
       },
-      appName: 'ArcusAir-StockWorker'
+      appName: 'CloudMart-StockWorker'
     },
     {
-      db: 'arcusairdb',
-      coll: 'appointments',
+      db: 'cloudmart_prod',
+      coll: 'cart_sessions',
       op: 'find',
       duration: 1450,
-      plan: 'IXSCAN { clinic_id: 1, status: 1 }',
+      plan: 'IXSCAN { store_id: 1, status: 1 }',
       docsExamined: 1540,
       keysExamined: 1540,
       nreturned: 8,
       cmd: {
-        find: 'appointments',
-        filter: { clinic_id: 42, status: 'SCHEDULED', slot_start: { $gte: '2026-08-17' } },
-        sort: { slot_start: 1 }
+        find: 'cart_sessions',
+        filter: { store_id: 42, status: 'CHECKOUT_ABANDONED', created_at: { $gte: '2026-08-17' } },
+        sort: { created_at: 1 }
       },
-      appName: 'ArcusAir-Scheduling'
+      appName: 'CloudMart-Checkout'
     }
   ];
 
@@ -193,9 +193,9 @@ export function generateRealisticDemoLog(): string {
         error: {
           code: 50,
           codeName: 'MaxTimeMSExpired',
-          errmsg: 'operation exceeded time limit of 15000ms on arcusairdb.patientorders'
+          errmsg: 'operation exceeded time limit of 15000ms on cloudmart_prod.orders'
         },
-        ns: 'arcusairdb.patientorders',
+        ns: 'cloudmart_prod.orders',
         durationMillis: 15002
       }
     },
@@ -208,9 +208,9 @@ export function generateRealisticDemoLog(): string {
         error: {
           code: 11000,
           codeName: 'DuplicateKey',
-          errmsg: 'E11000 duplicate key error collection: arcusairdb.users index: email_1 dup key: { email: "dr.miller@arcushealth.org" }'
+          errmsg: 'E11000 duplicate key error collection: cloudmart_prod.users index: email_1 dup key: { email: "alex.morgan@cloudmart.io" }'
         },
-        ns: 'arcusairdb.users',
+        ns: 'cloudmart_prod.users',
         durationMillis: 4
       }
     },
@@ -220,7 +220,7 @@ export function generateRealisticDemoLog(): string {
       id: 22401,
       msg: 'WiredTiger write conflict retry loop exceeded 10 iterations',
       attr: {
-        ns: 'arcusairdb.inventory',
+        ns: 'cloudmart_prod.inventory',
         durationMillis: 890
       }
     },
@@ -240,7 +240,7 @@ export function generateRealisticDemoLog(): string {
       id: 51803,
       msg: 'Slow query: Plan executor unindexed in-memory sort warning',
       attr: {
-        ns: 'arcusairdb.audit_logs',
+        ns: 'cloudmart_prod.audit_logs',
         planSummary: 'SORT',
         durationMillis: 2850
       }
@@ -269,7 +269,7 @@ export function generateRealisticDemoLog(): string {
         msg: errTpl.msg,
         attr: {
           ...errTpl.attr,
-          appName: 'ArcusAir-Service',
+          appName: 'CloudMart-Service',
           remote: `10.0.4.${(connId % 50) + 10}:${40000 + connId}`
         }
       }));
@@ -325,7 +325,7 @@ export function generateRealisticDemoLog(): string {
       normalCmd.documents = [{ id: `id_${i}`, created_at: dateStr }];
     } else if (op === 'aggregate') {
       normalCmd.aggregate = collObj.coll;
-      normalCmd.pipeline = [{ $match: { facility_id: 42 } }, { $limit: 20 }];
+      normalCmd.pipeline = [{ $match: { store_id: 42 } }, { $limit: 20 }];
     } else {
       normalCmd.delete = collObj.coll;
       normalCmd.deletes = [{ q: { temp_flag: true }, limit: 1 }];
@@ -345,7 +345,7 @@ export function generateRealisticDemoLog(): string {
         attr: {
           type: 'command',
           ns: `${collObj.db}.${collObj.coll}`,
-          appName: 'ArcusAir-WebAPI',
+          appName: 'CloudMart-WebAPI',
           command: normalCmd,
           planSummary: 'IXSCAN { _id: 1 }',
           keysExamined: 1,

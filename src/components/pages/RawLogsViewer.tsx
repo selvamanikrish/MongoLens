@@ -9,6 +9,7 @@ import {
   ArrowDownToLine,
   RotateCcw,
 } from 'lucide-react';
+import { formatDate, formatTime } from '../../lib/formatters';
 
 export const RawLogsViewer: React.FC = () => {
   const logResult = useLogStore((state) => state.logResult);
@@ -173,9 +174,13 @@ export const RawLogsViewer: React.FC = () => {
                     {entry.lineNumber}
                   </span>
 
-                  {/* Timestamp */}
-                  <span className="w-36 shrink-0 text-slate-400 text-[11px] truncate select-none">
-                    {entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : 'N/A'}
+                  {/* Timestamp (Date & Time) */}
+                  <span
+                    className="w-44 sm:w-48 shrink-0 text-[11px] font-mono select-none truncate"
+                    title={entry.timestamp}
+                  >
+                    <span className="text-slate-300">{formatDate(entry.timestamp)}</span>{' '}
+                    <span className="text-slate-500">{formatTime(entry.timestamp)}</span>
                   </span>
 
                   {/* Severity Badge */}

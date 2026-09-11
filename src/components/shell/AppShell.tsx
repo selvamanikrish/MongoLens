@@ -18,8 +18,10 @@ import { OverviewPage } from '../pages/OverviewPage';
 import { SlowQueriesPage } from '../pages/SlowQueriesPage';
 import { OperationsPage } from '../pages/OperationsPage';
 import { CollectionsPage } from '../pages/CollectionsPage';
+import { ConnectionsPage } from '../pages/ConnectionsPage';
 import { ErrorsPage } from '../pages/ErrorsPage';
 import { TimelinePage } from '../pages/TimelinePage';
+import { ComparePage } from '../pages/ComparePage';
 import { RawLogsViewer } from '../pages/RawLogsViewer';
 
 export const AppShell: React.FC = () => {
@@ -114,8 +116,10 @@ export const AppShell: React.FC = () => {
         else if (k === 's') setActivePage('slow-queries');
         else if (k === 'p') setActivePage('operations');
         else if (k === 'c') setActivePage('collections');
+        else if (k === 'n') setActivePage('connections');
         else if (k === 'e') setActivePage('errors');
         else if (k === 't') setActivePage('timeline');
+        else if (k === 'd') setActivePage('compare');
         else if (k === 'r') setActivePage('raw-logs');
       }
     };
@@ -150,10 +154,14 @@ export const AppShell: React.FC = () => {
         return <OperationsPage />;
       case 'collections':
         return <CollectionsPage />;
+      case 'connections':
+        return <ConnectionsPage />;
       case 'errors':
         return <ErrorsPage />;
       case 'timeline':
         return <TimelinePage />;
+      case 'compare':
+        return <ComparePage />;
       case 'raw-logs':
         return <RawLogsViewer />;
       default:

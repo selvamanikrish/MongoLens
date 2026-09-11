@@ -22,6 +22,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { formatDate, formatTime, formatDateTimeRange } from '../../lib/formatters';
 
 export const OverviewPage: React.FC = () => {
   const logResult = useLogStore((state) => state.logResult);
@@ -59,13 +60,14 @@ export const OverviewPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-slate-900/90 px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/10 self-start sm:self-auto">
+        <div
+          className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-slate-900/90 px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/10 self-start sm:self-auto"
+          title={summary.timeRange ? `${summary.timeRange.start} → ${summary.timeRange.end}` : undefined}
+        >
           <Clock className="w-3.5 h-3.5 text-brand-400 shrink-0" />
           <span className="truncate">
             {summary.timeRange?.start
-              ? `${new Date(summary.timeRange.start).toLocaleTimeString()} → ${new Date(
-                  summary.timeRange.end
-                ).toLocaleTimeString()}`
+              ? formatDateTimeRange(summary.timeRange.start, summary.timeRange.end)
               : 'Continuous Stream'}
           </span>
         </div>
@@ -449,7 +451,7 @@ export const OverviewPage: React.FC = () => {
                 <th className="pb-2 font-medium">Namespace</th>
                 <th className="pb-2 font-medium">Plan</th>
                 <th className="pb-2 font-medium">Docs Examined</th>
-                <th className="pb-2 font-medium">Time</th>
+                <th className="pb-2 font-medium">Date & Time</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 font-mono">
@@ -484,8 +486,9 @@ export const OverviewPage: React.FC = () => {
                   <td className="py-3 text-slate-300">
                     {q.docsExamined !== undefined ? q.docsExamined.toLocaleString() : 'N/A'}
                   </td>
-                  <td className="py-3 text-slate-500 text-[11px]">
-                    {q.timestamp ? new Date(q.timestamp).toLocaleTimeString() : 'N/A'}
+                  <td className="py-3 text-[11px] whitespace-nowrap" title={q.timestamp}>
+                    <span className="text-slate-300 font-medium">{formatDate(q.timestamp)}</span>{' '}
+                    <span className="text-slate-500">{formatTime(q.timestamp)}</span>
                   </td>
                 </tr>
               ))}

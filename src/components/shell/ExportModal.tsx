@@ -2,7 +2,21 @@ import React, { useState } from 'react';
 import { useLogStore } from '../../store/useLogStore';
 import { useFilteredLogs } from '../../hooks/useFilteredLogs';
 import { trackExportDownloaded } from '../../lib/analytics/gtag';
-import { X, Download, FileText, FileSpreadsheet, FileCode, Check } from 'lucide-react';
+import { generateIncidentRCA } from '../../lib/analytics/rcaGenerator';
+import { anonymizeString, anonymizeLogEntry } from '../../lib/anonymizer';
+import {
+  X,
+  Download,
+  FileText,
+  FileSpreadsheet,
+  FileCode,
+  Check,
+  Shield,
+  Copy,
+  Save,
+  AlertOctagon,
+  MessageSquare,
+} from 'lucide-react';
 
 export const ExportModal: React.FC = () => {
   const isOpen = useLogStore((state) => state.isExportOpen);
@@ -12,6 +26,7 @@ export const ExportModal: React.FC = () => {
   const { filteredEntries, filteredSlowQueries } = useFilteredLogs();
 
   const [downloadedFormat, setDownloadedFormat] = useState<string | null>(null);
+  const [copiedType, setCopiedType] = useState<'slack' | 'jira' | null>(null);
 
   if (!isOpen || !logResult) return null;
 
@@ -127,6 +142,46 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
     triggerDownload(md, `${fileInfo?.name || 'mongolens'}-diagnostic-report.md`, 'text/markdown', 'markdown_report', 1);
   };
 
+  const exportIncidentRCAMarkdown = () => {
+    const rca = generateIncidentRCA(logResult, fileInfo?.name || 'mongod.log');
+    triggerDownload(rca.markdown, `${fileInfo?.name || 'mongolens'}-incident-rca.md`, 'text/markdown', 'incident_rca_md', 1);
+  };
+
+  const copyRCASlack = () => {
+    const rca = generateIncidentRCA(logResult, fileInfo?.name || 'mongod.log');
+    navigator.clipboard.writeText(rca.slack);
+    setCopiedType('slack');
+    setTimeout(() => setCopiedType(null), 2500);
+  };
+
+  const copyRCAJira = () => {
+    const rca = generateIncidentRCA(logResult, fileInfo?.name || 'mongod.log');
+    navigator.clipboard.writeText(rca.markdown);
+    setCopiedType('jira');
+    setTimeout(() => setCopiedType(null), 2500);
+  };
+
+  const exportSanitizedLog = () => {
+    const sanitizedLines = filteredEntries.map((e) => anonymizeString(e.raw)).join('\n');
+    triggerDownload(sanitizedLines, `${fileInfo?.name || 'mongolens'}-sanitized.log`, 'text/plain', 'sanitized_log', filteredEntries.length);
+  };
+
+  const exportSanitizedJSONL = () => {
+    const sanitizedData = filteredEntries.map((e) => JSON.stringify(anonymizeLogEntry(e))).join('\n');
+    triggerDownload(sanitizedData, `${fileInfo?.name || 'mongolens'}-sanitized.jsonl`, 'application/x-ndjson', 'sanitized_jsonl', filteredEntries.length);
+  };
+
+  const exportSessionWorkspace = () => {
+    const session = {
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+      fileInfo,
+      logResult,
+    };
+    const jsonStr = JSON.stringify(session);
+    triggerDownload(jsonStr, `${fileInfo?.name?.replace(/\.[^/.]+$/, '') || 'workspace'}.mongolens`, 'application/json', 'mongolens_session', 1);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
       <div
@@ -140,8 +195,8 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
               <Download className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white">Export Log Diagnostics</h3>
-              <p className="text-[11px] text-slate-400">Download formatted records and diagnostic summaries</p>
+              <h3 className="text-sm font-semibold text-white">Export Log Diagnostics & Workspaces</h3>
+              <p className="text-[11px] text-slate-400">Incident RCAs, sanitized exports, and session saves</p>
             </div>
           </div>
           <button
@@ -154,20 +209,121 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
 
         {/* Content */}
         <div className="p-3.5 sm:p-4 space-y-3 max-h-[75vh] overflow-y-auto">
-          {/* Diagnostic Markdown Report */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-brand-950/30 border border-brand-500/30 hover:border-brand-500/60 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-300 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4" />
+          {/* 1. Incident RCA & Post-Mortem Generator */}
+          <div className="p-3.5 rounded-xl bg-red-950/20 border border-red-500/30 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-red-500/20 text-red-300 flex items-center justify-center shrink-0">
+                  <AlertOctagon className="w-4 h-4 text-red-400" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>Incident RCA / Post-Mortem</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-300 border border-red-500/30">
+                      1-Click Share
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-slate-400">Executive incident report with top culprits & fix plan</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1 flex-wrap">
+              <button
+                onClick={copyRCASlack}
+                className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-mono font-medium transition-colors flex items-center gap-1 border border-white/10"
+              >
+                {copiedType === 'slack' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <MessageSquare className="w-3.5 h-3.5 text-brand-400" />}
+                <span>Copy for Slack</span>
+              </button>
+              <button
+                onClick={copyRCAJira}
+                className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-mono font-medium transition-colors flex items-center gap-1 border border-white/10"
+              >
+                {copiedType === 'jira' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-cyan-400" />}
+                <span>Copy for Jira / GitHub</span>
+              </button>
+              <button
+                onClick={exportIncidentRCAMarkdown}
+                className="px-2.5 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs font-mono font-medium transition-colors flex items-center gap-1 border border-red-500/40 ml-auto"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>RCA .md</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 2. PII Sanitized Log Exporter */}
+          <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0">
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>Sanitized Log Export</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      PII Masked
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-slate-400">Redacts emails, UUIDs, IPs, and literals for secure sharing</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={exportSanitizedLog}
+                className="flex-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-emerald-500/20 text-slate-200 hover:text-emerald-200 text-xs font-mono transition-colors border border-white/10 flex items-center justify-center gap-1"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Sanitized .LOG</span>
+              </button>
+              <button
+                onClick={exportSanitizedJSONL}
+                className="flex-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-emerald-500/20 text-slate-200 hover:text-emerald-200 text-xs font-mono transition-colors border border-white/10 flex items-center justify-center gap-1"
+              >
+                <Download className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Sanitized .JSONL</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Session Saving (.mongolens) */}
+          <div className="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/30 flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center shrink-0">
+                <Save className="w-4 h-4 text-cyan-400" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-slate-100">Diagnostic Executive Report</h4>
-                <p className="text-[11px] text-slate-400">Comprehensive Markdown report with KPIs & slow queries</p>
+                <h4 className="text-xs font-bold text-white">Save Workspace Session</h4>
+                <p className="text-[11px] text-slate-400">Instant re-load file without re-parsing raw logs</p>
+              </div>
+            </div>
+            <button
+              onClick={exportSessionWorkspace}
+              className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>.mongolens</span>
+            </button>
+          </div>
+
+          {/* Diagnostic Markdown Report */}
+          <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-lg bg-brand-500/15 text-brand-300 flex items-center justify-center shrink-0">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-slate-100">Diagnostic Summary Report</h4>
+                <p className="text-[11px] text-slate-400">Standard Markdown summary of cluster KPIs</p>
               </div>
             </div>
             <button
               onClick={exportDiagnosticMarkdown}
-              className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm self-end sm:self-auto"
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5 border border-white/10"
             >
               <Download className="w-3.5 h-3.5" />
               Markdown
@@ -175,73 +331,58 @@ ${logResult.errorGroups.map((g) => `- **[${g.count}x] ${g.component}:** ${g.mess
           </div>
 
           {/* Slow Queries CSV */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/15 text-orange-400 flex items-center justify-center shrink-0">
-                <FileSpreadsheet className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-orange-500/15 text-orange-400 flex items-center justify-center shrink-0">
+                <FileSpreadsheet className="w-3.5 h-3.5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-slate-100">Slow Queries Dataset</h4>
-                <p className="text-[11px] text-slate-400">{filteredSlowQueries.length.toLocaleString()} slow queries in CSV format</p>
+                <h4 className="text-xs font-semibold text-slate-100">Slow Queries CSV</h4>
+                <p className="text-[11px] text-slate-400">{filteredSlowQueries.length.toLocaleString()} slow queries dataset</p>
               </div>
             </div>
             <button
               onClick={exportSlowQueriesCSV}
-              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5 border border-white/10 self-end sm:self-auto"
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5 border border-white/10"
             >
               <Download className="w-3.5 h-3.5 text-orange-400" />
               CSV
             </button>
           </div>
 
-          {/* Full Filtered Logs JSON / JSONL */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          {/* Full Filtered Logs JSON / JSONL / CSV */}
+          <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0">
-                <FileCode className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
+                <FileCode className="w-3.5 h-3.5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-slate-100">Filtered Normalized Logs</h4>
-                <p className="text-[11px] text-slate-400">{filteredEntries.length.toLocaleString()} matching log entries</p>
+                <h4 className="text-xs font-semibold text-slate-100">Filtered Entries ({filteredEntries.length.toLocaleString()})</h4>
+                <p className="text-[11px] text-slate-400">Export matching logs in structured formats</p>
               </div>
             </div>
-            <div className="flex gap-2 self-end sm:self-auto">
+            <div className="flex gap-1.5">
               <button
                 onClick={exportFilteredJSON}
-                className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors border border-white/10"
+                className="px-2 py-1 rounded bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-mono transition-colors border border-white/10"
               >
                 JSON
               </button>
               <button
                 onClick={exportFilteredJSONL}
-                className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors border border-white/10"
+                className="px-2 py-1 rounded bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-mono transition-colors border border-white/10"
               >
                 JSONL
               </button>
-            </div>
-          </div>
-
-          {/* CSV & Raw TXT */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-semibold text-slate-100">All Log Fields / Raw Log Text</h4>
-                <p className="text-[11px] text-slate-400">Export table fields or unparsed original log lines</p>
-              </div>
-            </div>
-            <div className="flex gap-2 self-end sm:self-auto">
               <button
                 onClick={exportFilteredCSV}
-                className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors border border-white/10"
+                className="px-2 py-1 rounded bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-mono transition-colors border border-white/10"
               >
                 CSV
               </button>
               <button
                 onClick={exportRawTXT}
-                className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-colors border border-white/10"
+                className="px-2 py-1 rounded bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-mono transition-colors border border-white/10"
               >
                 TXT
               </button>

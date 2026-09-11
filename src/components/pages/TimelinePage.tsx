@@ -11,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { formatDateTime, formatDateTimeRange } from '../../lib/formatters';
 
 export const TimelinePage: React.FC = () => {
   const logResult = useLogStore((state) => state.logResult);
@@ -34,12 +35,14 @@ export const TimelinePage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10 self-start sm:self-auto">
+        <div
+          className="flex items-center gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10 self-start sm:self-auto"
+          title={summary.timeRange ? `${summary.timeRange.start} → ${summary.timeRange.end}` : undefined}
+        >
+          <Clock className="w-3.5 h-3.5 text-brand-400 shrink-0" />
           <span className="truncate">
             {summary.timeRange?.start
-              ? `${new Date(summary.timeRange.start).toLocaleTimeString()} → ${new Date(
-                  summary.timeRange.end
-                ).toLocaleTimeString()}`
+              ? formatDateTimeRange(summary.timeRange.start, summary.timeRange.end)
               : 'Active Range'}
           </span>
         </div>
@@ -88,7 +91,9 @@ export const TimelinePage: React.FC = () => {
                     const d = payload[0].payload;
                     return (
                       <div className="bg-[#0f172a] border border-white/15 p-3 rounded-xl shadow-2xl text-xs space-y-1 font-mono">
-                        <div className="font-bold text-slate-200 border-b border-white/10 pb-1">{label}</div>
+                        <div className="font-bold text-slate-200 border-b border-white/10 pb-1">
+                          {d.timestamp ? formatDateTime(d.timestamp) : label}
+                        </div>
                         <div className="text-cyan-400">Total Throughput: {d.total} queries</div>
                         <div className="text-orange-400">Slow Queries: {d.slowCount}</div>
                         <div className="text-red-400">Errors: {d.errorCount}</div>
@@ -129,7 +134,7 @@ export const TimelinePage: React.FC = () => {
               <div className="p-3 rounded-xl bg-slate-900/60 border border-white/5 group-hover:border-orange-500/30 transition-all flex items-center justify-between gap-3 text-xs font-mono">
                 <div>
                   <div className="flex items-center gap-2 text-[11px] text-slate-400 mb-0.5">
-                    <span className="text-brand-300 font-semibold">{q.timestamp}</span>
+                    <span className="text-brand-300 font-semibold">{formatDateTime(q.timestamp)}</span>
                     <span>•</span>
                     <span className="text-orange-400 font-bold">{q.durationMillis}ms latency</span>
                   </div>

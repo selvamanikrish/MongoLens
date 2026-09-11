@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLogStore } from '../../store/useLogStore';
 import { AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { formatDate, formatTime, formatDateTime } from '../../lib/formatters';
 
 export const ErrorsPage: React.FC = () => {
   const logResult = useLogStore((state) => state.logResult);
@@ -104,8 +105,10 @@ export const ErrorsPage: React.FC = () => {
                             Code {group.errorCode}
                           </span>
                         )}
-                        <span className="text-[11px] text-slate-500 font-mono">
-                          Last seen: {new Date(group.lastSeen).toLocaleTimeString()}
+                        <span className="text-[11px] font-mono" title={group.lastSeen}>
+                          <span className="text-slate-500">Last seen: </span>
+                          <span className="text-slate-300 font-medium">{formatDate(group.lastSeen)}</span>{' '}
+                          <span className="text-slate-500">{formatTime(group.lastSeen)}</span>
                         </span>
                       </div>
 
@@ -138,7 +141,7 @@ export const ErrorsPage: React.FC = () => {
                             <div className="flex items-center gap-2 text-[11px] text-slate-400 mb-1">
                               <span className="text-slate-300 font-semibold">Line #{instance.lineNumber}</span>
                               <span>•</span>
-                              <span>{instance.timestamp}</span>
+                              <span className="text-slate-300 font-mono" title={instance.timestamp}>{formatDateTime(instance.timestamp)}</span>
                               {instance.context && (
                                 <>
                                   <span>•</span>

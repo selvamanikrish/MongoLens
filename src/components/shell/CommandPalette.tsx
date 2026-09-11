@@ -18,6 +18,8 @@ import {
   ShieldCheck,
   FileText,
   Mail,
+  Network,
+  GitCompare,
 } from 'lucide-react';
 
 export const CommandPalette: React.FC = () => {
@@ -100,6 +102,16 @@ export const CommandPalette: React.FC = () => {
       },
     },
     {
+      id: 'nav-connections',
+      label: 'Go to Connections & Clients Topology',
+      category: 'Navigation',
+      icon: Network,
+      action: () => {
+        setActivePage('connections');
+        setIsOpen(false);
+      },
+    },
+    {
       id: 'nav-errors',
       label: 'Go to Errors & Exceptions Hub',
       category: 'Navigation',
@@ -116,6 +128,16 @@ export const CommandPalette: React.FC = () => {
       icon: Clock,
       action: () => {
         setActivePage('timeline');
+        setIsOpen(false);
+      },
+    },
+    {
+      id: 'nav-compare',
+      label: 'Go to Before vs After Log Comparison',
+      category: 'Navigation',
+      icon: GitCompare,
+      action: () => {
+        setActivePage('compare');
         setIsOpen(false);
       },
     },

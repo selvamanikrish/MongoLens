@@ -8,6 +8,7 @@ import {
   ChevronRight,
   RotateCcw,
 } from 'lucide-react';
+import { formatDate, formatTime } from '../../lib/formatters';
 
 export const SlowQueriesPage: React.FC = () => {
   const logResult = useLogStore((state) => state.logResult);
@@ -211,7 +212,7 @@ export const SlowQueriesPage: React.FC = () => {
                   <th className="py-3 px-3 sm:px-4 font-semibold">Plan Summary</th>
                   <th className="py-3 px-3 sm:px-4 font-semibold">Docs Examined</th>
                   <th className="py-3 px-3 sm:px-4 font-semibold">Docs Returned</th>
-                  <th className="py-3 px-3 sm:px-4 font-semibold">Time</th>
+                  <th className="py-3 px-3 sm:px-4 font-semibold">Date & Time</th>
                   <th className="py-3 px-3 sm:px-4 text-right font-semibold">Action</th>
                 </tr>
               </thead>
@@ -279,9 +280,10 @@ export const SlowQueriesPage: React.FC = () => {
                         {q.nReturned !== undefined ? q.nReturned.toLocaleString() : 'N/A'}
                       </td>
 
-                      {/* Time */}
-                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
-                        {q.timestamp ? new Date(q.timestamp).toLocaleTimeString() : 'N/A'}
+                      {/* Date & Time */}
+                      <td className="py-3.5 px-4 text-[11px] whitespace-nowrap" title={q.timestamp}>
+                        <span className="text-slate-300 font-medium">{formatDate(q.timestamp)}</span>{' '}
+                        <span className="text-slate-500">{formatTime(q.timestamp)}</span>
                       </td>
 
                       {/* Inspect Action */}

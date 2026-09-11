@@ -11,9 +11,7 @@ export const CollectionsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'queries' | 'avg' | 'p95' | 'slow' | 'errors' | 'collscan'>('queries');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
-  if (!logResult) return null;
-
-  const { collections } = logResult;
+  const collections = useMemo(() => logResult?.collections || [], [logResult?.collections]);
 
   const filteredAndSortedCollections = useMemo(() => {
     const list = collections.filter((c) =>
@@ -31,6 +29,8 @@ export const CollectionsPage: React.FC = () => {
       return sortOrder === 'desc' ? diff : -diff;
     });
   }, [collections, search, sortBy, sortOrder]);
+
+  if (!logResult) return null;
 
   const handleSort = (field: typeof sortBy) => {
     if (sortBy === field) {

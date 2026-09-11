@@ -59,14 +59,14 @@ export const QueryDetailDrawer: React.FC = () => {
       className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end animate-fade-in"
     >
       <div
-        className="w-full sm:max-w-xl md:max-w-2xl bg-[#0b101c] border-l border-white/10 h-full flex flex-col shadow-2xl animate-slide-in-right overflow-y-auto"
+        className="w-full max-w-full sm:max-w-xl md:max-w-2xl bg-[#0b101c] border-l border-white/10 h-full flex flex-col shadow-2xl animate-slide-in-right overflow-y-auto overflow-x-hidden min-w-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-3.5 sm:p-5 border-b border-white/10 bg-[#090d16] flex items-center justify-between sticky top-0 z-10 gap-2">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="p-3.5 sm:p-5 border-b border-white/10 bg-[#090d16] flex items-center justify-between sticky top-0 z-10 gap-2 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div
-              className={`px-2 sm:px-3 py-1 rounded-full text-xs font-mono font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${
+              className={`px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-mono font-bold flex items-center gap-1 sm:gap-1.5 border shrink-0 ${
                 durationMs >= 2000
                   ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-glow-error'
                   : durationMs >= 500
@@ -75,13 +75,13 @@ export const QueryDetailDrawer: React.FC = () => {
               }`}
             >
               <Clock className="w-3.5 h-3.5 shrink-0" />
-              <span>{durationText}</span>
+              <span className="truncate">{durationText}</span>
             </div>
 
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 truncate">
                 <span className="uppercase text-brand-400 font-mono shrink-0">{selectedQuery.operation || 'QUERY'}</span>
-                <span className="text-slate-500 font-normal">on</span>
+                <span className="text-slate-500 font-normal shrink-0">on</span>
                 <span className="font-mono text-slate-200 truncate">{selectedQuery.namespace || 'database'}</span>
               </h3>
               <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono truncate" title={selectedQuery.timestamp}>
@@ -93,75 +93,79 @@ export const QueryDetailDrawer: React.FC = () => {
           <button
             onClick={() => setDrawerOpen(false)}
             className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors shrink-0"
+            title="Close Drawer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 flex-1">
+        <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 flex-1 min-w-0 overflow-x-hidden">
           {/* Metadata Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-white/5">
-              <span className="text-[11px] text-slate-500 block mb-0.5">Execution Plan</span>
-              <span className={`inline-block px-2 py-0.5 rounded text-xs font-mono border ${getPlanBadgeClass(selectedQuery.planSummary)}`}>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5 min-w-0">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-white/5 min-w-0 overflow-hidden">
+              <span className="text-[10px] sm:text-[11px] text-slate-500 block mb-0.5 truncate">Execution Plan</span>
+              <span
+                className={`inline-block px-2 py-0.5 rounded text-[11px] sm:text-xs font-mono border max-w-full truncate ${getPlanBadgeClass(selectedQuery.planSummary)}`}
+                title={selectedQuery.planSummary || 'UNKNOWN'}
+              >
                 {selectedQuery.planSummary || 'UNKNOWN'}
               </span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-white/5">
-              <span className="text-[11px] text-slate-500 block mb-0.5">Docs Examined</span>
-              <span className="text-xs font-mono font-semibold text-slate-200">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-white/5 min-w-0 overflow-hidden">
+              <span className="text-[10px] sm:text-[11px] text-slate-500 block mb-0.5 truncate">Docs Examined</span>
+              <span className="text-[11px] sm:text-xs font-mono font-semibold text-slate-200 block truncate" title={selectedQuery.docsExamined?.toLocaleString()}>
                 {selectedQuery.docsExamined !== undefined ? selectedQuery.docsExamined.toLocaleString() : 'N/A'}
               </span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-white/5">
-              <span className="text-[11px] text-slate-500 block mb-0.5">Keys Examined</span>
-              <span className="text-xs font-mono font-semibold text-slate-200">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-white/5 min-w-0 overflow-hidden">
+              <span className="text-[10px] sm:text-[11px] text-slate-500 block mb-0.5 truncate">Keys Examined</span>
+              <span className="text-[11px] sm:text-xs font-mono font-semibold text-slate-200 block truncate" title={selectedQuery.keysExamined?.toLocaleString()}>
                 {selectedQuery.keysExamined !== undefined ? selectedQuery.keysExamined.toLocaleString() : 'N/A'}
               </span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-white/5">
-              <span className="text-[11px] text-slate-500 block mb-0.5">Docs Returned</span>
-              <span className="text-xs font-mono font-semibold text-brand-400">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-white/5 min-w-0 overflow-hidden">
+              <span className="text-[10px] sm:text-[11px] text-slate-500 block mb-0.5 truncate">Docs Returned</span>
+              <span className="text-[11px] sm:text-xs font-mono font-semibold text-brand-400 block truncate" title={selectedQuery.nReturned?.toLocaleString()}>
                 {selectedQuery.nReturned !== undefined ? selectedQuery.nReturned.toLocaleString() : 'N/A'}
               </span>
             </div>
           </div>
 
           {/* Context Details */}
-          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-white/5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div>
-              <span className="text-slate-500 block text-[10px] uppercase font-mono">Connection Context</span>
-              <span className="text-slate-300 font-mono">{selectedQuery.context}</span>
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/60 border border-white/5 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-xs min-w-0">
+            <div className="min-w-0 overflow-hidden">
+              <span className="text-slate-500 block text-[10px] uppercase font-mono truncate">Connection Context</span>
+              <span className="text-slate-300 font-mono block truncate" title={selectedQuery.context}>{selectedQuery.context}</span>
             </div>
-            <div>
-              <span className="text-slate-500 block text-[10px] uppercase font-mono">Client Remote</span>
-              <span className="text-slate-300 font-mono">{selectedQuery.remote || 'Local / Cluster'}</span>
+            <div className="min-w-0 overflow-hidden">
+              <span className="text-slate-500 block text-[10px] uppercase font-mono truncate">Client Remote</span>
+              <span className="text-slate-300 font-mono block truncate" title={selectedQuery.remote || 'Local / Cluster'}>{selectedQuery.remote || 'Local / Cluster'}</span>
             </div>
-            <div>
-              <span className="text-slate-500 block text-[10px] uppercase font-mono">Application Name</span>
-              <span className="text-slate-300 font-mono truncate block">{selectedQuery.appName || 'Unknown Client'}</span>
+            <div className="min-w-0 overflow-hidden">
+              <span className="text-slate-500 block text-[10px] uppercase font-mono truncate">Application Name</span>
+              <span className="text-slate-300 font-mono truncate block" title={selectedQuery.appName || 'Unknown Client'}>{selectedQuery.appName || 'Unknown Client'}</span>
             </div>
           </div>
 
           {/* Intelligent Query Analysis & Insights Section */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-mono">
-                <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                Intelligent Performance Insights
+          <div className="space-y-3 min-w-0">
+            <div className="flex items-center justify-between min-w-0">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-mono truncate">
+                <Sparkles className="w-3.5 h-3.5 text-brand-400 shrink-0" />
+                <span className="truncate">Intelligent Performance Insights</span>
               </h4>
-              <span className="text-[11px] text-slate-500 font-mono">{insights.length} findings</span>
+              <span className="text-[11px] text-slate-500 font-mono shrink-0">{insights.length} findings</span>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 min-w-0">
               {insights.map((insight, idx) => (
                 <div
                   key={idx}
-                  className={`p-4 rounded-xl border transition-all ${
+                  className={`p-3.5 sm:p-4 rounded-xl border transition-all min-w-0 overflow-hidden ${
                     insight.type === 'danger'
                       ? 'bg-red-950/20 border-red-500/30 text-red-200'
                       : insight.type === 'warning'
@@ -171,7 +175,7 @@ export const QueryDetailDrawer: React.FC = () => {
                       : 'bg-blue-950/20 border-blue-500/30 text-blue-200'
                   }`}
                 >
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2.5 min-w-0">
                     {insight.type === 'danger' ? (
                       <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                     ) : insight.type === 'warning' ? (
@@ -182,31 +186,31 @@ export const QueryDetailDrawer: React.FC = () => {
                       <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                     )}
 
-                    <div className="flex-1 space-y-1 text-xs">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-white">{insight.title}</span>
+                    <div className="flex-1 space-y-1 text-xs min-w-0 overflow-hidden">
+                      <div className="flex items-center gap-2 flex-wrap min-w-0">
+                        <span className="font-semibold text-white break-words">{insight.title}</span>
                         {insight.antiPattern && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-300 border border-red-500/30 font-semibold">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-300 border border-red-500/30 font-semibold shrink-0">
                             <Zap className="w-3 h-3 text-red-400" />
                             {insight.antiPattern.title}
                           </span>
                         )}
                       </div>
-                      <p className="text-slate-300 leading-relaxed">{insight.description}</p>
+                      <p className="text-slate-300 leading-relaxed break-words">{insight.description}</p>
                       {insight.recommendation && (
-                        <p className="text-slate-400 pt-1 text-[11px]">
+                        <p className="text-slate-400 pt-1 text-[11px] break-words">
                           <strong>Recommendation:</strong> {insight.recommendation}
                         </p>
                       )}
 
                       {/* ESR Suggested Index Snippet */}
                       {insight.suggestedIndex && (
-                        <div className="mt-3 p-3 rounded-lg bg-black/60 border border-white/10 flex items-center justify-between gap-2">
-                          <div className="min-w-0 flex-1">
+                        <div className="mt-3 p-2.5 sm:p-3 rounded-lg bg-black/60 border border-white/10 flex items-center justify-between gap-2 min-w-0 overflow-hidden">
+                          <div className="min-w-0 flex-1 overflow-hidden">
                             <span className="text-[10px] uppercase font-mono text-brand-400 block mb-1">
                               Recommended ESR Index
                             </span>
-                            <code className="text-xs font-mono text-brand-200 block truncate">{insight.suggestedIndex}</code>
+                            <code className="text-xs font-mono text-brand-200 block truncate" title={insight.suggestedIndex}>{insight.suggestedIndex}</code>
                           </div>
                           <button
                             onClick={() => copyToClipboard(insight.suggestedIndex!, 'index')}
@@ -224,12 +228,12 @@ export const QueryDetailDrawer: React.FC = () => {
 
                       {/* mongosh Explain Script Snippet */}
                       {insight.explainScript && (
-                        <div className="mt-2.5 p-2.5 rounded-lg bg-black/60 border border-cyan-500/25 flex items-center justify-between gap-2">
-                          <div className="min-w-0 flex-1">
+                        <div className="mt-2.5 p-2.5 rounded-lg bg-black/60 border border-cyan-500/25 flex items-center justify-between gap-2 min-w-0 overflow-hidden">
+                          <div className="min-w-0 flex-1 overflow-hidden">
                             <span className="text-[10px] uppercase font-mono text-cyan-400 flex items-center gap-1 mb-0.5">
-                              <Terminal className="w-3 h-3" /> mongosh Execution Stats
+                              <Terminal className="w-3 h-3 shrink-0" /> <span className="truncate">mongosh Execution Stats</span>
                             </span>
-                            <code className="text-[11px] font-mono text-cyan-200 block truncate">{insight.explainScript}</code>
+                            <code className="text-[11px] font-mono text-cyan-200 block truncate" title={insight.explainScript}>{insight.explainScript}</code>
                           </div>
                           <button
                             onClick={() => copyToClipboard(insight.explainScript!, 'explain')}
@@ -252,13 +256,13 @@ export const QueryDetailDrawer: React.FC = () => {
           </div>
 
           {/* Formatted Command Payload */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
+          <div className="space-y-2 min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-2 min-w-0">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-mono">
-                <FileCode className="w-3.5 h-3.5 text-cyan-400" />
-                Command Payload & Query Filter
+                <FileCode className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Command Payload & Query Filter</span>
               </h4>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <button
                   onClick={() => {
                     const sanitized = selectedQuery.command ? anonymizeCommandObject(selectedQuery.command) : selectedQuery.commandStr;
@@ -287,17 +291,17 @@ export const QueryDetailDrawer: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#070a12] border border-white/10 font-mono text-xs overflow-x-auto max-h-[300px] text-slate-200">
-              <pre className="whitespace-pre">{formattedCommandJson}</pre>
+            <div className="p-3 sm:p-4 rounded-xl bg-[#070a12] border border-white/10 font-mono text-xs overflow-x-auto max-w-full max-h-[300px] text-slate-200 min-w-0">
+              <pre className="whitespace-pre font-mono">{formattedCommandJson}</pre>
             </div>
           </div>
 
           {/* Raw Log Line */}
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
               Raw MongoDB Log Entry
             </h4>
-            <div className="p-3 rounded-lg bg-black/50 border border-white/5 text-[11px] font-mono text-slate-400 break-all">
+            <div className="p-3 rounded-lg bg-black/50 border border-white/5 text-[11px] font-mono text-slate-400 break-all overflow-hidden max-w-full">
               {selectedQuery.raw}
             </div>
           </div>

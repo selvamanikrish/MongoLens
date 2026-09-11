@@ -81,10 +81,10 @@ export const ErrorsPage: React.FC = () => {
                 {/* Error Header Bar */}
                 <div
                   onClick={() => toggleGroup(group.id)}
-                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-white/5 transition-colors"
+                  className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 cursor-pointer hover:bg-white/5 transition-colors min-w-0"
                 >
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="mt-0.5">
+                  <div className="flex items-start gap-2.5 sm:gap-3 flex-1 min-w-0">
+                    <div className="mt-0.5 shrink-0">
                       {isExpanded ? (
                         <ChevronDown className="w-4 h-4 text-slate-400" />
                       ) : (
@@ -93,31 +93,31 @@ export const ErrorsPage: React.FC = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className="badge-error px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+                        <span className="badge-error px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0">
                           {group.severity}
                         </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-white/5 border border-white/10 text-slate-300 font-semibold uppercase">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-white/5 border border-white/10 text-slate-300 font-semibold uppercase shrink-0">
                           {group.component}
                         </span>
                         {group.errorCode && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-red-950/60 border border-red-500/30 text-red-300">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-red-950/60 border border-red-500/30 text-red-300 shrink-0">
                             Code {group.errorCode}
                           </span>
                         )}
-                        <span className="text-[11px] font-mono" title={group.lastSeen}>
+                        <span className="text-[11px] font-mono break-all sm:break-normal" title={group.lastSeen}>
                           <span className="text-slate-500">Last seen: </span>
                           <span className="text-slate-300 font-medium">{formatDate(group.lastSeen)}</span>{' '}
                           <span className="text-slate-500">{formatTime(group.lastSeen)}</span>
                         </span>
                       </div>
 
-                      <p className="font-mono text-xs text-red-200 truncate">{group.message}</p>
+                      <p className="font-mono text-xs text-red-200 truncate" title={group.message}>{group.message}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                    <span className="badge-error px-3 py-1 rounded-full font-mono text-xs font-bold shadow-sm">
+                  <div className="flex items-center gap-3 shrink-0 self-start sm:self-center pl-7 sm:pl-0">
+                    <span className="badge-error px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full font-mono text-[11px] sm:text-xs font-bold shadow-sm">
                       × {group.count}
                     </span>
                   </div>
@@ -125,31 +125,31 @@ export const ErrorsPage: React.FC = () => {
 
                 {/* Expanded Instances List */}
                 {isExpanded && (
-                  <div className="p-4 bg-[#070b13] border-t border-white/10 space-y-2 animate-fade-in">
+                  <div className="p-3 sm:p-4 bg-[#070b13] border-t border-white/10 space-y-2 animate-fade-in min-w-0">
                     <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2">
                       Sample Occurrences ({group.instances.length} shown)
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       {group.instances.map((instance) => (
                         <div
                           key={instance.id}
                           onClick={() => selectQuery(instance)}
-                          className="p-3 rounded-lg bg-black/40 border border-white/5 hover:border-red-500/30 cursor-pointer text-xs font-mono transition-colors group flex items-center justify-between gap-3"
+                          className="p-2.5 sm:p-3 rounded-lg bg-black/40 border border-white/5 hover:border-red-500/30 cursor-pointer text-xs font-mono transition-colors group flex items-center justify-between gap-2.5 sm:gap-3 min-w-0"
                         >
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 text-[11px] text-slate-400 mb-1">
-                              <span className="text-slate-300 font-semibold">Line #{instance.lineNumber}</span>
-                              <span>•</span>
-                              <span className="text-slate-300 font-mono" title={instance.timestamp}>{formatDateTime(instance.timestamp)}</span>
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] text-slate-400 mb-1 min-w-0">
+                              <span className="text-slate-300 font-semibold shrink-0">Line #{instance.lineNumber}</span>
+                              <span className="shrink-0">•</span>
+                              <span className="text-slate-300 font-mono shrink-0" title={instance.timestamp}>{formatDateTime(instance.timestamp)}</span>
                               {instance.context && (
                                 <>
-                                  <span>•</span>
-                                  <span className="text-cyan-400">{instance.context}</span>
+                                  <span className="shrink-0">•</span>
+                                  <span className="text-cyan-400 truncate max-w-[140px] sm:max-w-[220px]" title={instance.context}>{instance.context}</span>
                                 </>
                               )}
                             </div>
-                            <div className="text-slate-300 truncate text-[11px]">{instance.raw}</div>
+                            <div className="text-slate-300 truncate text-[11px]" title={instance.raw}>{instance.raw}</div>
                           </div>
 
                           <span className="text-[10px] font-sans text-slate-400 group-hover:text-red-400 shrink-0 flex items-center gap-0.5">

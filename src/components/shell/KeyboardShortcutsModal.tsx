@@ -15,8 +15,10 @@ export const KeyboardShortcutsModal: React.FC = () => {
     { key: 'G then S', desc: 'Jump to Slow Queries' },
     { key: 'G then P', desc: 'Jump to Operations Breakdown' },
     { key: 'G then C', desc: 'Jump to Collections Analytics' },
+    { key: 'G then N', desc: 'Jump to Connections & Clients' },
     { key: 'G then E', desc: 'Jump to Errors & Exceptions' },
     { key: 'G then T', desc: 'Jump to Event Timeline' },
+    { key: 'G then D', desc: 'Jump to Before/After Compare Diff' },
     { key: 'G then R', desc: 'Jump to Raw Logs Console' },
     { key: 'Esc', desc: 'Close Query Detail Drawer or Active Modal' },
   ];

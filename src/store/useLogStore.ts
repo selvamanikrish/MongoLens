@@ -53,9 +53,16 @@ interface LogStoreState {
   isPrivacyOpen: boolean;
   isContactOpen: boolean;
 
+  // Comparison State
+  baselineResult: WorkerParseResult | null;
+  baselineFileInfo: { name: string; size: number } | null;
+
   // Actions
   parseFile: (file: File) => void;
   loadDemoLog: () => void;
+  loadSessionData: (session: { fileInfo: { name: string; size: number; type: string }; logResult: WorkerParseResult }) => void;
+  setBaselineLog: (result: WorkerParseResult, fileInfo: { name: string; size: number }) => void;
+  clearBaselineLog: () => void;
   setActivePage: (page: ActivePage) => void;
   setMobileSidebarOpen: (open: boolean) => void;
   setFilters: (filters: Partial<FilterState>) => void;
@@ -97,6 +104,30 @@ export const useLogStore = create<LogStoreState>((set) => ({
   isTermsOpen: false,
   isPrivacyOpen: false,
   isContactOpen: false,
+  baselineResult: null,
+  baselineFileInfo: null,
+
+  loadSessionData: (session) => {
+    if (activeWorker) {
+      activeWorker.terminate();
+      activeWorker = null;
+    }
+    set({
+      fileInfo: session.fileInfo,
+      logResult: session.logResult,
+      isParsing: false,
+      activePage: 'overview',
+      filters: initialFilters,
+    });
+  },
+
+  setBaselineLog: (result, fileInfo) => {
+    set({ baselineResult: result, baselineFileInfo: fileInfo });
+  },
+
+  clearBaselineLog: () => {
+    set({ baselineResult: null, baselineFileInfo: null });
+  },
 
   parseFile: (file: File) => {
     if (activeWorker) {
@@ -258,6 +289,8 @@ export const useLogStore = create<LogStoreState>((set) => ({
       fileInfo: null,
       isParsing: false,
       logResult: null,
+      baselineResult: null,
+      baselineFileInfo: null,
       selectedQuery: null,
       isDrawerOpen: false,
       isMobileSidebarOpen: false,

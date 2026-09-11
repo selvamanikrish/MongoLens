@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useLogStore } from '../../store/useLogStore';
 import { analyzeQueryPerformance } from '../../lib/queryAnalyzer';
+import { anonymizeCommandObject } from '../../lib/anonymizer';
+import { formatDateTime } from '../../lib/formatters';
 import {
   X,
   Copy,
@@ -12,6 +14,8 @@ import {
   Info,
   CheckCircle2,
   Terminal,
+  Shield,
+  Zap,
 } from 'lucide-react';
 
 export const QueryDetailDrawer: React.FC = () => {
@@ -19,7 +23,7 @@ export const QueryDetailDrawer: React.FC = () => {
   const isDrawerOpen = useLogStore((state) => state.isDrawerOpen);
   const setDrawerOpen = useLogStore((state) => state.setDrawerOpen);
 
-  const [copiedType, setCopiedType] = useState<'json' | 'raw' | 'index' | null>(null);
+  const [copiedType, setCopiedType] = useState<'json' | 'raw' | 'index' | 'explain' | 'sanitized' | null>(null);
 
   const insights = useMemo(() => {
     if (!selectedQuery) return [];
@@ -28,7 +32,7 @@ export const QueryDetailDrawer: React.FC = () => {
 
   if (!isDrawerOpen || !selectedQuery) return null;
 
-  const copyToClipboard = (text: string, type: 'json' | 'raw' | 'index') => {
+  const copyToClipboard = (text: string, type: 'json' | 'raw' | 'index' | 'explain' | 'sanitized') => {
     navigator.clipboard.writeText(text);
     setCopiedType(type);
     setTimeout(() => setCopiedType(null), 2000);
@@ -80,7 +84,9 @@ export const QueryDetailDrawer: React.FC = () => {
                 <span className="text-slate-500 font-normal">on</span>
                 <span className="font-mono text-slate-200 truncate">{selectedQuery.namespace || 'database'}</span>
               </h3>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono truncate">Line #{selectedQuery.lineNumber} • {selectedQuery.timestamp}</p>
+              <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono truncate" title={selectedQuery.timestamp}>
+                Line #{selectedQuery.lineNumber} • {formatDateTime(selectedQuery.timestamp)}
+              </p>
             </div>
           </div>
 
@@ -177,7 +183,15 @@ export const QueryDetailDrawer: React.FC = () => {
                     )}
 
                     <div className="flex-1 space-y-1 text-xs">
-                      <div className="font-semibold text-white">{insight.title}</div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-white">{insight.title}</span>
+                        {insight.antiPattern && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-300 border border-red-500/30 font-semibold">
+                            <Zap className="w-3 h-3 text-red-400" />
+                            {insight.antiPattern.title}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-slate-300 leading-relaxed">{insight.description}</p>
                       {insight.recommendation && (
                         <p className="text-slate-400 pt-1 text-[11px]">
@@ -188,11 +202,11 @@ export const QueryDetailDrawer: React.FC = () => {
                       {/* ESR Suggested Index Snippet */}
                       {insight.suggestedIndex && (
                         <div className="mt-3 p-3 rounded-lg bg-black/60 border border-white/10 flex items-center justify-between gap-2">
-                          <div>
+                          <div className="min-w-0 flex-1">
                             <span className="text-[10px] uppercase font-mono text-brand-400 block mb-1">
                               Recommended ESR Index
                             </span>
-                            <code className="text-xs font-mono text-brand-200">{insight.suggestedIndex}</code>
+                            <code className="text-xs font-mono text-brand-200 block truncate">{insight.suggestedIndex}</code>
                           </div>
                           <button
                             onClick={() => copyToClipboard(insight.suggestedIndex!, 'index')}
@@ -203,6 +217,29 @@ export const QueryDetailDrawer: React.FC = () => {
                               <Check className="w-4 h-4 text-emerald-400" />
                             ) : (
                               <Copy className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* mongosh Explain Script Snippet */}
+                      {insight.explainScript && (
+                        <div className="mt-2.5 p-2.5 rounded-lg bg-black/60 border border-cyan-500/25 flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <span className="text-[10px] uppercase font-mono text-cyan-400 flex items-center gap-1 mb-0.5">
+                              <Terminal className="w-3 h-3" /> mongosh Execution Stats
+                            </span>
+                            <code className="text-[11px] font-mono text-cyan-200 block truncate">{insight.explainScript}</code>
+                          </div>
+                          <button
+                            onClick={() => copyToClipboard(insight.explainScript!, 'explain')}
+                            className="p-1.5 rounded-md bg-white/10 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors shrink-0"
+                            title="Copy mongosh explain script"
+                          >
+                            {copiedType === 'explain' ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
                             )}
                           </button>
                         </div>
@@ -222,6 +259,17 @@ export const QueryDetailDrawer: React.FC = () => {
                 Command Payload & Query Filter
               </h4>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const sanitized = selectedQuery.command ? anonymizeCommandObject(selectedQuery.command) : selectedQuery.commandStr;
+                    copyToClipboard(JSON.stringify(sanitized, null, 2), 'sanitized');
+                  }}
+                  className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-mono transition-colors border border-white/10"
+                  title="Copy JSON with PII and literals masked"
+                >
+                  {copiedType === 'sanitized' ? <Check className="w-3 h-3 text-emerald-400" /> : <Shield className="w-3 h-3 text-brand-400" />}
+                  <span>Sanitized</span>
+                </button>
                 <button
                   onClick={() => copyToClipboard(formattedCommandJson, 'json')}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-mono transition-colors border border-white/10"

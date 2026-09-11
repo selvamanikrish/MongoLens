@@ -21,6 +21,7 @@ export const FileDropzone: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isParsing = useLogStore((state) => state.isParsing);
   const parseFile = useLogStore((state) => state.parseFile);
+  const loadSessionData = useLogStore((state) => state.loadSessionData);
   const loadDemoLog = useLogStore((state) => state.loadDemoLog);
   const setTermsOpen = useLogStore((state) => state.setTermsOpen);
   const setPrivacyOpen = useLogStore((state) => state.setPrivacyOpen);
@@ -38,6 +39,22 @@ export const FileDropzone: React.FC = () => {
     setIsDragging(false);
   };
 
+  const processFile = async (file: File) => {
+    if (file.name.endsWith('.mongolens')) {
+      try {
+        const text = await file.text();
+        const session = JSON.parse(text);
+        if (session.logResult && session.fileInfo) {
+          loadSessionData(session);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to parse .mongolens session:', err);
+      }
+    }
+    parseFile(file);
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -45,14 +62,14 @@ export const FileDropzone: React.FC = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      parseFile(file);
+      processFile(file);
     }
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      parseFile(file);
+      processFile(file);
     }
   };
 
@@ -153,7 +170,7 @@ export const FileDropzone: React.FC = () => {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".log,.txt,.gz,.zip"
+                accept=".log,.txt,.gz,.zip,.mongolens"
                 onChange={handleFileInputChange}
                 className="hidden"
               />
@@ -163,7 +180,7 @@ export const FileDropzone: React.FC = () => {
               </div>
 
               <h3 className="text-base sm:text-lg font-semibold text-white mb-1 group-hover:text-brand-300 transition-colors">
-                Drop MongoDB logs here
+                Drop MongoDB logs or sessions here
               </h3>
               <p className="text-xs text-slate-400 mb-3 sm:mb-4">
                 or <span className="text-brand-400 underline underline-offset-4 font-medium">browse from your computer</span>
@@ -171,7 +188,7 @@ export const FileDropzone: React.FC = () => {
 
               {/* Supported formats pills */}
               <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                {['.log', '.txt', '.gz', '.zip'].map((ext) => (
+                {['.log', '.txt', '.gz', '.zip', '.mongolens'].map((ext) => (
                   <span
                     key={ext}
                     className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-mono bg-white/5 border border-white/10 text-slate-300 group-hover:border-brand-500/30 transition-colors"

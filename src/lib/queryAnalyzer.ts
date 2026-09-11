@@ -87,16 +87,101 @@ export function analyzeQueryPerformance(entry: LogEntry): PerformanceInsight[] {
       const hasLookup = pipeline.some((st: any) => st.$lookup);
       if (hasLookup) {
         insights.push({
-          type: 'info',
+          type: 'warning',
           title: 'Foreign Collection Join ($lookup)',
           description: 'The pipeline performs a foreign collection join ($lookup). Unindexed foreign field lookups run sequentially on the target collection.',
           recommendation: 'Ensure an index exists on the foreign collection matching the "foreignField" in the $lookup stage.',
+          antiPattern: {
+            code: 'UNINDEXED_LOOKUP',
+            title: 'Unindexed Foreign $lookup Stage',
+            description: 'Unindexed $lookup forces nested collection scans on the foreign collection for every input document.',
+            severity: 'warning',
+          },
         });
       }
     }
   }
 
-  // 6. High Duration Severity Alert
+  // 6. Anti-Pattern: Leading Regex Wildcard
+  if (entry.command) {
+    const filter = entry.command.filter || entry.command.query || (entry.command.pipeline && entry.command.pipeline[0] ? entry.command.pipeline[0].$match : null);
+    if (filter && typeof filter === 'object') {
+      const checkRegexWildcard = (obj: any): boolean => {
+        for (const [k, v] of Object.entries(obj)) {
+          if (k === '$regex' && typeof v === 'string') {
+            if (v.startsWith('.*') || v.startsWith('%') || !v.startsWith('^')) return true;
+          } else if (typeof v === 'string' && (v.startsWith('/.*') || (v.startsWith('/') && !v.startsWith('/^')))) {
+            return true;
+          } else if (typeof v === 'object' && v !== null && checkRegexWildcard(v)) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      if (checkRegexWildcard(filter)) {
+        insights.push({
+          type: 'danger',
+          title: 'Anti-Pattern: Leading Wildcard in Regex',
+          description: 'Regex filter contains a leading wildcard (e.g. ".*abc" or unanchored string). MongoDB cannot use index b-tree prefixes for unanchored regexes.',
+          recommendation: 'Anchor the regex with "^" (e.g., /^prefix/) or implement MongoDB Atlas Search / text index for full-text search.',
+          antiPattern: {
+            code: 'REGEX_WILDCARD',
+            title: 'Unanchored Regex Filter',
+            description: 'Leading wildcards force full index or collection scans because the start of the string is unknown.',
+            severity: 'critical',
+          },
+        });
+      }
+
+      // Anti-Pattern: Unbounded $in array
+      const checkUnboundedIn = (obj: any): number => {
+        for (const [k, v] of Object.entries(obj)) {
+          if (k === '$in' && Array.isArray(v)) {
+            if (v.length > 30) return v.length;
+          } else if (typeof v === 'object' && v !== null) {
+            const nested = checkUnboundedIn(v);
+            if (nested > 0) return nested;
+          }
+        }
+        return 0;
+      };
+
+      const inCount = checkUnboundedIn(filter);
+      if (inCount > 30) {
+        insights.push({
+          type: 'warning',
+          title: `Anti-Pattern: Large $in Predicate Array (${inCount} items)`,
+          description: `Query passes ${inCount} values into an $in array. Large $in clauses force MongoDB to maintain large cursor branches and consume excessive RAM.`,
+          recommendation: 'Break large $in lists into smaller batched queries or use a join collection with an indexed lookup.',
+          antiPattern: {
+            code: 'UNBOUNDED_IN',
+            title: 'Unbounded $in Array',
+            description: 'Massive $in clauses significantly degrade B-tree index lookup efficiency.',
+            severity: 'warning',
+          },
+        });
+      }
+
+      // Anti-Pattern: Missing projection on find
+      if (entry.operation === 'find' && (entry.nReturned || 0) > 10 && !entry.command.projection && !entry.command.fields) {
+        insights.push({
+          type: 'info',
+          title: 'Missing Projection Clause',
+          description: 'The query returns entire documents without a projection filter. This increases wire serialization and memory overhead.',
+          recommendation: 'Specify a projection object (e.g. { field1: 1, field2: 1 }) to return only required attributes.',
+          antiPattern: {
+            code: 'MISSING_PROJECTION',
+            title: 'Unprojected Document Retrieval',
+            description: 'Fetching entire documents wastes network bandwidth and memory when only specific fields are needed.',
+            severity: 'info',
+          },
+        });
+      }
+    }
+  }
+
+  // 7. High Duration Severity Alert
   if (duration >= 5000) {
     insights.push({
       type: 'danger',
@@ -113,7 +198,7 @@ export function analyzeQueryPerformance(entry: LogEntry): PerformanceInsight[] {
     });
   }
 
-  // 7. Error or Exception Insight
+  // 8. Error or Exception Insight
   if (entry.isError) {
     insights.push({
       type: 'danger',
@@ -123,6 +208,12 @@ export function analyzeQueryPerformance(entry: LogEntry): PerformanceInsight[] {
     });
   }
 
+  // Attach mongosh explain script to the first critical/warning insight
+  const explainScript = generateExplainScript(entry);
+  if (insights.length > 0 && explainScript) {
+    insights[0].explainScript = explainScript;
+  }
+
   // If no negative insights found and duration is fast
   if (insights.length === 0) {
     if (plan.includes('IXSCAN')) {
@@ -130,17 +221,48 @@ export function analyzeQueryPerformance(entry: LogEntry): PerformanceInsight[] {
         type: 'success',
         title: 'Optimal Index Scan (IXSCAN)',
         description: 'The query successfully utilized an existing index for filtering.',
+        explainScript: explainScript || undefined,
       });
     } else {
       insights.push({
         type: 'info',
         title: 'Standard Log Record',
         description: 'No major performance anomalies detected for this specific entry.',
+        explainScript: explainScript || undefined,
       });
     }
   }
 
   return insights;
+}
+
+export function generateExplainScript(entry: LogEntry): string | null {
+  if (!entry.collection && !entry.namespace) return null;
+  const coll = entry.collection || (entry.namespace ? entry.namespace.split('.')[1] : 'collection');
+  const cmd = entry.command;
+
+  if (entry.operation === 'find' || cmd?.find) {
+    const filter = cmd?.filter || cmd?.query || {};
+    const sort = cmd?.sort;
+    let script = `db.${coll}.find(${JSON.stringify(filter)})`;
+    if (sort) script += `.sort(${JSON.stringify(sort)})`;
+    script += `.explain("executionStats")`;
+    return script;
+  }
+
+  if (entry.operation === 'aggregate' || cmd?.aggregate) {
+    const pipeline = cmd?.pipeline || [];
+    return `db.${coll}.aggregate(${JSON.stringify(pipeline, null, 2)}, { explain: "executionStats" })`;
+  }
+
+  if (entry.operation === 'update' || cmd?.update) {
+    const updates = cmd && cmd.updates ? cmd.updates[0] : undefined;
+    const q = updates?.q || {};
+    const u = updates?.u || {};
+    return `db.${coll}.explain("executionStats").update(${JSON.stringify(q)}, ${JSON.stringify(u)})`;
+  }
+
+  return `db.${coll}.find({}).explain("executionStats")`;
 }
 
 function generateIndexSuggestion(entry: LogEntry): string | null {
@@ -190,8 +312,9 @@ function generateIndexSuggestion(entry: LogEntry): string | null {
 
   if (Object.keys(indexKeys).length > 0) {
     const keysStr = JSON.stringify(indexKeys).replace(/"/g, '');
-    return `db.${coll}.createIndex(${keysStr})`;
+    return `db.${coll}.createIndex(${keysStr}, { background: true })`;
   }
 
-  return `db.${coll}.createIndex({ <field>: 1 })`;
+  return `db.${coll}.createIndex({ <field>: 1 }, { background: true })`;
 }
+

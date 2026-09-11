@@ -104,12 +104,21 @@ export interface ErrorGroup {
   instances: LogEntry[];
 }
 
+export interface AntiPatternFinding {
+  code: 'REGEX_WILDCARD' | 'UNBOUNDED_IN' | 'SORT_BUFFER_RISK' | 'MISSING_PROJECTION' | 'UNINDEXED_LOOKUP';
+  title: string;
+  description: string;
+  severity: 'critical' | 'warning' | 'info';
+}
+
 export interface PerformanceInsight {
   type: 'danger' | 'warning' | 'info' | 'success';
   title: string;
   description: string;
   recommendation?: string;
   suggestedIndex?: string;
+  antiPattern?: AntiPatternFinding;
+  explainScript?: string;
 }
 
 export type ActivePage = 
@@ -117,8 +126,10 @@ export type ActivePage =
   | 'slow-queries'
   | 'operations'
   | 'collections'
+  | 'connections'
   | 'errors'
   | 'timeline'
+  | 'compare'
   | 'raw-logs';
 
 export interface FilterState {
@@ -149,6 +160,82 @@ export interface ParseProgressPayload {
   errorMessage?: string;
 }
 
+export interface ConnectionTimelinePoint {
+  time: string;
+  timestamp: number;
+  activeConnections: number;
+  connectionsAccepted: number;
+  connectionsClosed: number;
+}
+
+export interface AppConnectionStat {
+  appName: string;
+  count: number;
+  percentage: number;
+  slowQueriesCount: number;
+}
+
+export interface RemoteHostStat {
+  remoteHost: string;
+  count: number;
+  percentage: number;
+}
+
+export interface SocketErrorStat {
+  message: string;
+  count: number;
+  lastSeen: string;
+  remote?: string;
+}
+
+export interface ConnectionDiagnostics {
+  totalAccepted: number;
+  totalClosed: number;
+  maxConcurrent: number;
+  currentEstimated: number;
+  timeline: ConnectionTimelinePoint[];
+  topApps: AppConnectionStat[];
+  topRemotes: RemoteHostStat[];
+  socketErrors: SocketErrorStat[];
+}
+
+export interface MetricDelta {
+  baseline: number;
+  candidate: number;
+  delta: number;
+  percentChange: number;
+  improved: boolean;
+}
+
+export interface QueryComparisonItem {
+  shape: string;
+  namespace: string;
+  operation: string;
+  status: 'resolved' | 'regressed' | 'new' | 'improved' | 'unchanged';
+  baselineAvgMs?: number;
+  candidateAvgMs?: number;
+  baselineCount?: number;
+  candidateCount?: number;
+  deltaMs?: number;
+  percentChange?: number;
+  sampleEntry: LogEntry;
+}
+
+export interface ComparisonResult {
+  baselineName: string;
+  candidateName: string;
+  metrics: {
+    p50: MetricDelta;
+    p95: MetricDelta;
+    p99: MetricDelta;
+    avgDuration: MetricDelta;
+    slowQueriesCount: MetricDelta;
+    errorsCount: MetricDelta;
+    collscanCount: MetricDelta;
+  };
+  queryDiffs: QueryComparisonItem[];
+}
+
 export interface WorkerParseResult {
   entries: LogEntry[];
   summary: LogSummary;
@@ -157,4 +244,5 @@ export interface WorkerParseResult {
   operations: OperationStat[];
   errorGroups: ErrorGroup[];
   slowQueries: LogEntry[];
+  connections?: ConnectionDiagnostics;
 }

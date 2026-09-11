@@ -8,6 +8,8 @@ import type {
   ParseProgressPayload,
   TimelineBucket,
   WorkerParseResult,
+  ConnectionDiagnostics,
+  ConnectionTimelinePoint,
 } from '../types';
 import { parseJsonLogLine } from '../lib/parsers/jsonLogParser';
 import { parseLegacyLogLine } from '../lib/parsers/legacyLogParser';
@@ -173,6 +175,16 @@ async function processStreamReader(reader: ReadableStreamDefaultReader<Uint8Arra
     errorCount: number;
     durations: number[];
   }>();
+
+  // Connection diagnostics tracking state
+  let totalConnectionsAccepted = 0;
+  let totalConnectionsClosed = 0;
+  let maxConcurrentConnections = 0;
+  let currentConnections = 0;
+  const appMap = new Map<string, { count: number; slowQueriesCount: number }>();
+  const remoteMap = new Map<string, number>();
+  const socketErrorMap = new Map<string, { count: number; lastSeen: string; remote?: string }>();
+  const connectionTimelineMap = new Map<number, { accepted: number; closed: number; activeEstimate: number }>();
 
   while (true) {
     const { done, value } = await reader.read();
@@ -362,6 +374,60 @@ async function processStreamReader(reader: ReadableStreamDefaultReader<Uint8Arra
           b.durations.push(entry.durationMillis);
         }
       }
+
+      // Update Connection Diagnostics
+      const lowerMsg = (entry.message || '').toLowerCase();
+      const isConnAccepted = lowerMsg.includes('connection accepted') || lowerMsg.includes('accepted connection');
+      const isConnClosed = lowerMsg.includes('connection ended') || lowerMsg.includes('connection closed') || lowerMsg.includes('end connection');
+      const isSocketError = lowerMsg.includes('socketexception') || lowerMsg.includes('connection reset');
+
+      if (isConnAccepted) {
+        totalConnectionsAccepted++;
+        currentConnections++;
+        if (currentConnections > maxConcurrentConnections) maxConcurrentConnections = currentConnections;
+      }
+      if (isConnClosed) {
+        totalConnectionsClosed++;
+        currentConnections = Math.max(0, currentConnections - 1);
+      }
+
+      if (entry.appName) {
+        let appStat = appMap.get(entry.appName);
+        if (!appStat) {
+          appStat = { count: 0, slowQueriesCount: 0 };
+          appMap.set(entry.appName, appStat);
+        }
+        appStat.count++;
+        if (entry.isSlowQuery) appStat.slowQueriesCount++;
+      }
+
+      if (entry.remote) {
+        const hostOnly = entry.remote.split(':')[0] || entry.remote;
+        remoteMap.set(hostOnly, (remoteMap.get(hostOnly) || 0) + 1);
+      }
+
+      if (isSocketError || (entry.isError && lowerMsg.includes('socket'))) {
+        const errKey = entry.message.slice(0, 100);
+        let sStat = socketErrorMap.get(errKey);
+        if (!sStat) {
+          sStat = { count: 0, lastSeen: entry.timestamp, remote: entry.remote };
+          socketErrorMap.set(errKey, sStat);
+        }
+        sStat.count++;
+        sStat.lastSeen = entry.timestamp;
+      }
+
+      if (entry.parsedDate) {
+        const connBucketKey = Math.floor(entry.parsedDate / 60000) * 60000;
+        let cBucket = connectionTimelineMap.get(connBucketKey);
+        if (!cBucket) {
+          cBucket = { accepted: 0, closed: 0, activeEstimate: currentConnections };
+          connectionTimelineMap.set(connBucketKey, cBucket);
+        }
+        if (isConnAccepted) cBucket.accepted++;
+        if (isConnClosed) cBucket.closed++;
+        cBucket.activeEstimate = Math.max(cBucket.activeEstimate, currentConnections);
+      }
     }
 
     // Emit progress throttle (every 100ms)
@@ -520,6 +586,62 @@ async function processStreamReader(reader: ReadableStreamDefaultReader<Uint8Arra
     uniqueOperations: operations.map((o) => o.operation),
   };
 
+  // Compile Connection Diagnostics
+  const topApps = Array.from(appMap.entries())
+    .map(([appName, stat]) => ({
+      appName,
+      count: stat.count,
+      percentage: Number(((stat.count / Math.max(1, lineNumber)) * 100).toFixed(1)),
+      slowQueriesCount: stat.slowQueriesCount,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const topRemotes = Array.from(remoteMap.entries())
+    .map(([remoteHost, count]) => ({
+      remoteHost,
+      count,
+      percentage: Number(((count / Math.max(1, lineNumber)) * 100).toFixed(1)),
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 15);
+
+  const socketErrors = Array.from(socketErrorMap.entries())
+    .map(([message, stat]) => ({
+      message,
+      count: stat.count,
+      lastSeen: stat.lastSeen,
+      remote: stat.remote,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const connTimeline: ConnectionTimelinePoint[] = [];
+  const sortedConnKeys = Array.from(connectionTimelineMap.keys()).sort((a, b) => a - b);
+  const connStep = Math.max(1, Math.floor(sortedConnKeys.length / 50));
+  for (let k = 0; k < sortedConnKeys.length; k += connStep) {
+    const key = sortedConnKeys[k];
+    const b = connectionTimelineMap.get(key)!;
+    const d = new Date(key);
+    const timeLabel = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+    connTimeline.push({
+      time: timeLabel,
+      timestamp: key,
+      activeConnections: b.activeEstimate || 1,
+      connectionsAccepted: b.accepted,
+      connectionsClosed: b.closed,
+    });
+  }
+
+  const connections: ConnectionDiagnostics = {
+    totalAccepted: totalConnectionsAccepted,
+    totalClosed: totalConnectionsClosed,
+    maxConcurrent: Math.max(maxConcurrentConnections, 1),
+    currentEstimated: currentConnections,
+    timeline: connTimeline,
+    topApps,
+    topRemotes,
+    socketErrors,
+  };
+
   const finalResult: WorkerParseResult = {
     entries: rawLogsSample,
     summary,
@@ -528,6 +650,7 @@ async function processStreamReader(reader: ReadableStreamDefaultReader<Uint8Arra
     operations,
     errorGroups,
     slowQueries: slowQueriesPool,
+    connections,
   };
 
   postProgress({

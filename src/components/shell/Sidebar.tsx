@@ -16,7 +16,10 @@ import {
   Mail,
   FileText,
   X,
+  Network,
+  GitCompare,
 } from 'lucide-react';
+import { formatDateTimeRange } from '../../lib/formatters';
 
 interface NavItem {
   id: ActivePage;
@@ -55,6 +58,7 @@ export const Sidebar: React.FC = () => {
     },
     { id: 'operations', label: 'Operations', icon: Layers, shortcut: 'G P' },
     { id: 'collections', label: 'Collections', icon: Database, shortcut: 'G C' },
+    { id: 'connections', label: 'Connections', icon: Network, shortcut: 'G N' },
     {
       id: 'errors',
       label: 'Errors',
@@ -64,6 +68,7 @@ export const Sidebar: React.FC = () => {
       shortcut: 'G E',
     },
     { id: 'timeline', label: 'Timeline', icon: Clock, shortcut: 'G T' },
+    { id: 'compare', label: 'Compare Diff', icon: GitCompare, shortcut: 'G D' },
     { id: 'raw-logs', label: 'Raw Logs', icon: Terminal, shortcut: 'G R' },
   ];
 
@@ -182,6 +187,17 @@ export const Sidebar: React.FC = () => {
             <span>{fileInfo?.size ? `${(fileInfo.size / (1024 * 1024)).toFixed(2)} MB` : 'Memory'}</span>
             <span>{logResult?.summary.totalEntries.toLocaleString() || 0} lines</span>
           </div>
+          {logResult?.summary.timeRange?.start && (
+            <div
+              className="mt-2 pt-1.5 border-t border-white/5 text-[10px] font-mono text-slate-400 flex items-center gap-1.5 truncate"
+              title={`${logResult.summary.timeRange.start} → ${logResult.summary.timeRange.end}`}
+            >
+              <Clock className="w-3 h-3 text-brand-400 shrink-0" />
+              <span className="truncate">
+                {formatDateTimeRange(logResult.summary.timeRange.start, logResult.summary.timeRange.end)}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}

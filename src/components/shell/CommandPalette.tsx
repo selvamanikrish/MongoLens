@@ -257,7 +257,7 @@ export const CommandPalette: React.FC = () => {
     },
     {
       id: 'legal-contact',
-      label: 'Contact Support (support.mongolens@gmail.com)',
+      label: 'Contact Support (app.careassist@gmail.com)',
       sublabel: 'Technical help, bug reports & feedback',
       category: 'Legal & Support',
       icon: Mail,

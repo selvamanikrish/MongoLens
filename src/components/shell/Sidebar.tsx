@@ -240,7 +240,7 @@ export const Sidebar: React.FC = () => {
           <button
             onClick={() => setContactOpen(true)}
             className="hover:text-brand-300 transition-colors flex items-center gap-0.5"
-            title="Support: support.mongolens@gmail.com"
+            title="Support: app.careassist@gmail.com"
           >
             <Mail className="w-3 h-3 text-brand-400" />
             <span>Support</span>

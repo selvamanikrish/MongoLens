@@ -9,7 +9,7 @@ export const ContactModal: React.FC = () => {
   const [subject, setSubject] = useState('General Support & Feedback');
   const [message, setMessage] = useState('');
 
-  const email = 'support.mongolens@gmail.com';
+  const email = 'app.careassist@gmail.com';
 
   if (!isOpen) return null;
 

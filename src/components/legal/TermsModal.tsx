@@ -92,7 +92,7 @@ export const TermsModal: React.FC = () => {
               For any questions, legal feedback, or support inquiries regarding these terms, please contact us at:
             </p>
             <div className="p-3 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-between">
-              <span className="font-mono text-brand-300 font-semibold">support.mongolens@gmail.com</span>
+              <span className="font-mono text-brand-300 font-semibold">app.careassist@gmail.com</span>
               <button
                 onClick={() => {
                   setIsOpen(false);
